@@ -34,6 +34,12 @@ TABLE_TITLES = {
             "nl": "Jouw interesses volgens Instagram:",
         }
     ),
+    "instagram_your_personal_info": props.Translatable(
+            {
+                "en": "Your personal info:",
+                "nl": "Your personal info:",
+            }
+    ),
     "empty_result_set": props.Translatable(
         {
             "en": "We could not extract any data:",
@@ -78,7 +84,7 @@ def process(sessionId):
                 # 2: No extracted result: valid package, generated empty df: continue
                 # 3: No extracted result: not a valid package, retry loop
 
-                if extractionResult: 
+                if extractionResult:
                     LOGGER.info("Payload for %s", platform_name)
                     yield donate_logs(f"{sessionId}-tracking")
                     data = extractionResult
@@ -130,7 +136,7 @@ def process(sessionId):
 # helper functions
 
 def prompt_consent(platform_name, data):
-    """ 
+    """
     Function collects extracted in data and assembles them in
     PropsUIPromptConsentForm which can be rendered on screen
     for the participant to approve
@@ -183,21 +189,44 @@ def extract_instagram(instagram_zip):
 
     validation = instagram.validate_zip(instagram_zip)
 
-    interests_bytes = unzipddp.extract_file_from_zip(instagram_zip, "ads_interests.json")
-    interests_dict = unzipddp.read_json_from_bytes(interests_bytes)
-    interests = instagram.interests_to_list(interests_dict)
-    if interests:
-        df = pd.DataFrame(interests, columns=["Interests"])
-        result["interests"] = {"data": df, "title": TABLE_TITLES["instagram_interests"]}
+    # interests_bytes = unzipddp.extract_file_from_zip(instagram_zip, "ads_interests.json")
+    # interests_dict = unzipddp.read_json_from_bytes(interests_bytes)
+    # interests = instagram.interests_to_list(interests_dict)
+    # if interests:
+    #     df = pd.DataFrame(interests, columns=["Interests"])
+    #     result["interests"] = {"data": df, "title": TABLE_TITLES["instagram_interests"]}
 
-    your_topics_bytes = unzipddp.extract_file_from_zip(instagram_zip, "your_topics.json")
-    your_topics_dict = unzipddp.read_json_from_bytes(your_topics_bytes)
-    your_topics = instagram.your_topics_to_list(your_topics_dict)
-    if your_topics:
+    #extracting personal information file
+    pinfo_bytes = unzipddp.extract_file_from_zip(instagram_zip, "personal_information.json")
+    pinfo_dict = unzipddp.read_json_from_bytes(pinfo_bytes)
+    your_pinfo = instagram.personal_information_to_list(pinfo_dict)
+
+    #extracting personal information file
+    followers_bytes = unzipddp.extract_file_from_zip(instagram_zip, "followers_1.json")
+    followers_dict = unzipddp.read_json_from_bytes(followers_bytes)
+    print('followers_dict followers_dict, ',followers_dict)
+    #extracting personal information file
+    following_bytes = unzipddp.extract_file_from_zip(instagram_zip, "following.json")
+    following_dict = unzipddp.read_json_from_bytes(following_bytes)
+
+    your_pinfo.append(instagram.followers_to_list(followers_dict))
+    your_pinfo.append(instagram.following_to_list(following_dict))
+
+    if your_pinfo:
         # We need to perform some data wrangling in this step
-        df = pd.DataFrame(your_topics, columns=["Your Topics"])
-        result["your_topics"] = {"data": df, "title": TABLE_TITLES["instagram_your_topics"]}
-  
+        df = pd.DataFrame(your_pinfo, columns=["Your Info"])
+        result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"]}
+
+    # print('pinfo_dict: ', your_pinfo)
+
+    # your_topics_bytes = unzipddp.extract_file_from_zip(instagram_zip, "your_topics.json")
+    # your_topics_dict = unzipddp.read_json_from_bytes(your_topics_bytes)
+    # your_topics = instagram.your_topics_to_list(your_topics_dict)
+    # if your_topics:
+    #     # We need to perform some data wrangling in this step
+    #     df = pd.DataFrame(your_topics, columns=["Your Topics"])
+    #     result["your_topics"] = {"data": df, "title": TABLE_TITLES["instagram_your_topics"]}
+
     return validation, result
 
 

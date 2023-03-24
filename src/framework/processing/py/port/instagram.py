@@ -156,3 +156,133 @@ def your_topics_to_list(dict_with_topics: dict[Any, Any] | Any) -> list[str]:
         return out
 
 
+def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[str]:
+    """
+    This function extracts instagram personal information from a dict
+    This dict should be obtained from personal_information.json
+    personal_information.json content is language dependent
+
+    This function should be rewritten as personal_information.json changes
+    """
+    out = []
+
+    try:
+        if not isinstance(dict_with_pinfo, dict):
+            raise TypeError("The input to this function was not dict")
+
+        print('dict_with_pinfo: ',dict_with_pinfo)
+        # dict_with_pinfo["profile_user"][0]["string_map_data"]["Username"]
+        username = ''
+        gender = ''
+        dateofbirth = ''
+        private_account = ''
+
+        # we are handling english and dutch only for now
+        if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Username') is not None:
+            username = dict_with_pinfo["profile_user"][0]["string_map_data"]["Username"]["value"]
+        elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Gebruikersnaam') is not None:
+            username = dict_with_pinfo["profile_user"][0]["string_map_data"]["Gebruikersnaam"]["value"]
+        else:
+            print('username not found')
+
+        if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Gender') is not None:
+            gender = dict_with_pinfo["profile_user"][0]["string_map_data"]["Gender"]["value"]
+        elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Geslacht') is not None:
+            gender = dict_with_pinfo["profile_user"][0]["string_map_data"]["Geslacht"]["value"]
+        else:
+            print('gender not found')
+
+
+        # What is the english version of it? Get insta examples.
+        if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Dateofbirth') is not None:
+            dateofbirth = dict_with_pinfo["profile_user"][0]["string_map_data"]["Dateofbirth"]["value"]
+        elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Geboortedatum') is not None:
+            dateofbirth = dict_with_pinfo["profile_user"][0]["string_map_data"]["Geboortedatum"]["value"]
+        else:
+            print('date of birth not found')
+
+
+        if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Private Account') is not None:
+            private_account = dict_with_pinfo["profile_user"][0]["string_map_data"]["Private Account"]["value"]
+        elif dict_with_pinfo["profile_user"][0]["string_map_data"].get(u'PrivÃ©account') is not None:
+            private_account = dict_with_pinfo["profile_user"][0]["string_map_data"][u"PrivÃ©account"]["value"]
+        else:
+            print('private_account not found')
+
+        out.append(username)
+        out.append(gender)
+        out.append(dateofbirth)
+        out.append(private_account)
+
+
+
+    except TypeError as e:
+        logger.error("TypeError: %s", e)
+    except KeyError as e:
+        logger.error("The a dict did not contain the key: %s", e)
+    except Exception as e:
+        logger.error("Exception was caught:  %s", e)
+
+    finally:
+        return out
+
+
+
+def followers_to_list(dict_with_followers: list[Any] | Any) -> list[str]:
+    """
+    This function extracts instagram your_topics from a dict
+    This dict should be obtained from your_topics.json
+
+    This function should be rewritten as your_topics.json changes
+    """
+    out = []
+
+    try:
+        if not isinstance(dict_with_followers, list):
+            raise TypeError("The input to this function was not dict followers_to_list")
+
+        print('Followers length ', len(dict_with_followers))
+        out.append(len(dict_with_followers))
+
+
+
+
+    except TypeError as e:
+        logger.error("TypeError: %s", e)
+    except KeyError as e:
+        logger.error("The a dict did not contain the key: %s", e)
+    except Exception as e:
+        logger.error("Exception was caught:  %s", e)
+
+    finally:
+        return out
+
+
+def following_to_list(dict_with_following: dict[Any, Any] | Any) -> list[str]:
+    """
+    This function extracts instagram your_topics from a dict
+    This dict should be obtained from your_topics.json
+
+    This function should be rewritten as your_topics.json changes
+    """
+    out = []
+
+    try:
+        if not isinstance(dict_with_following, dict):
+            raise TypeError("The input to this function was not dict")
+
+        print('Following length ', len(dict_with_following['relationships_following']))
+        out.append(len(dict_with_following['relationships_following']))
+
+
+
+
+    except TypeError as e:
+        logger.error("TypeError: %s", e)
+    except KeyError as e:
+        logger.error("The a dict did not contain the key: %s", e)
+    except Exception as e:
+        logger.error("Exception was caught:  %s", e)
+
+    finally:
+        return out

@@ -83,7 +83,7 @@ function startPyodide() {
   console.log('[ProcessingWorker] loading Pyodide')
   return loadPyodide({
     indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.21.2/full/'
-  })  
+  })
 }
 
 function loadPackages() {
@@ -96,6 +96,8 @@ function installPortPackage() {
   return self.pyodide.runPythonAsync(`
     import micropip
     await micropip.install("/port-0.0.0-py3-none-any.whl", deps=False)
+    await micropip.install("https://d3i-infra.github.io/ddp-inspector/ddpinspect/dist/ddpinspect-0.0.0-py3-none-any.whl", deps=False)
+    
     import port
-  `);  
+  `);
 }
