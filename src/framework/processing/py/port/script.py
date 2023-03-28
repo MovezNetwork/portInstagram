@@ -40,6 +40,12 @@ TABLE_TITLES = {
                 "nl": "Your personal info:",
             }
     ),
+    "instagram_messages_summary": props.Translatable(
+            {
+                "en": "Your messages summary:",
+                "nl": "Your messages summary:",
+            }
+    ),
     "empty_result_set": props.Translatable(
         {
             "en": "We could not extract any data:",
@@ -117,6 +123,7 @@ def process(sessionId):
         if data is not None:
             LOGGER.info("Prompt consent; %s", platform_name)
             yield donate_logs(f"{sessionId}-tracking")
+
             prompt = prompt_consent(platform_name, data)
             consent_result = yield render_donation_page(platform_name, prompt, progress)
 
@@ -153,6 +160,7 @@ def prompt_consent(platform_name, data):
 
     for k, v in data.items():
         df = v["data"]
+        print('prompt_consent dataframe', df)
         table = props.PropsUIPromptConsentFormTable(f"{platform_name}_{k}", v["title"], df)
         table_list.append(table)
 
@@ -211,12 +219,26 @@ def extract_instagram(instagram_zip):
 
     your_pinfo.append(instagram.followers_to_list(followers_dict))
     your_pinfo.append(instagram.following_to_list(following_dict))
-
+    print('your_pinfo ',your_pinfo)
     if your_pinfo:
         # We need to perform some data wrangling in this step
-        df = pd.DataFrame(your_pinfo, columns=["Your Info"])
+        df = pd.DataFrame([tuple(your_pinfo)], columns=["insta_name", "gender", "date of birth", "private account", "n_followers", "n_following"])
         result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"]}
 
+    messages_list_dict = unzipddp.extract_messages_from_zip(instagram_zip)
+    print(len(messages_list_dict))
+    # print(messages_list_dict[0])
+    your_messages = instagram.process_message_json(messages_list_dict)
+
+    df = pd.DataFrame(your_messages, columns=["alter_name", "alter_insta_username", "n_messages", "n_words", "n_chars"])
+    print(df.dtypes)
+    # df[["n_messages", "n_words", "n_chars"]] = df[["n_messages", "n_words", "n_chars"]].apply(pd.to_numeric)
+    # print(df.dtypes)
+    # print('BEFORE SORT', df)
+
+    df = df.sort_values("n_chars",ascending=False)
+    # print('AFTER SORT', df)
+    result["your_messages"] = {"data":  df, "title": TABLE_TITLES["instagram_messages_summary"]}
     # print('pinfo_dict: ', your_pinfo)
 
     # your_topics_bytes = unzipddp.extract_file_from_zip(instagram_zip, "your_topics.json")

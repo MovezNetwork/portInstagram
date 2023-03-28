@@ -8,6 +8,8 @@ from typing import Any
 from pathlib import Path
 import logging
 import zipfile
+import re
+import string
 
 from port.validate import (
     DDPCategory,
@@ -57,6 +59,7 @@ DDP_CATEGORIES = [
             "use_cross-app_messaging.json",
             "profile_changes.json",
             "reels.json",
+            "message_1.json"
         ],
     )
 ]
@@ -170,7 +173,7 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
         if not isinstance(dict_with_pinfo, dict):
             raise TypeError("The input to this function was not dict")
 
-        print('dict_with_pinfo: ',dict_with_pinfo)
+        # print('dict_with_pinfo: ',dict_with_pinfo)
         # dict_with_pinfo["profile_user"][0]["string_map_data"]["Username"]
         username = ''
         gender = ''
@@ -235,14 +238,14 @@ def followers_to_list(dict_with_followers: list[Any] | Any) -> list[str]:
 
     This function should be rewritten as your_topics.json changes
     """
-    out = []
+    out = 0
 
     try:
         if not isinstance(dict_with_followers, list):
             raise TypeError("The input to this function was not dict followers_to_list")
 
         print('Followers length ', len(dict_with_followers))
-        out.append(len(dict_with_followers))
+        out = len(dict_with_followers)
 
 
 
@@ -265,17 +268,70 @@ def following_to_list(dict_with_following: dict[Any, Any] | Any) -> list[str]:
 
     This function should be rewritten as your_topics.json changes
     """
-    out = []
+    out = 0
 
     try:
         if not isinstance(dict_with_following, dict):
             raise TypeError("The input to this function was not dict")
 
         print('Following length ', len(dict_with_following['relationships_following']))
-        out.append(len(dict_with_following['relationships_following']))
+        out = len(dict_with_following['relationships_following'])
 
 
 
+
+    except TypeError as e:
+        logger.error("TypeError: %s", e)
+    except KeyError as e:
+        logger.error("The a dict did not contain the key: %s", e)
+    except Exception as e:
+        logger.error("Exception was caught:  %s", e)
+
+    finally:
+        return out
+
+
+def process_message_json(messages_list_dict: list[Any] | Any) -> list[str]:
+    """
+    This function extracts instagram your_topics from a dict
+    This dict should be obtained from your_topics.json
+
+    This function should be rewritten as your_topics.json changes
+    """
+    out = []
+    printable = set(string.printable)
+
+    try:
+        if not isinstance(messages_list_dict, list):
+            raise TypeError("The input to this function was not list")
+        # loop through every dict
+        for mes in messages_list_dict:
+            alter_username = mes["title"]
+            alter_insta = mes["thread_path"][6:mes["thread_path"].rfind("_")]
+            num_chars = 0
+            num_words = 0
+            num_messages = 0
+            # print(mes["title"],mes["thread_path"],mes["thread_path"][6:mes["thread_path"].rfind("_")])
+            print('Chats with ', alter_username,alter_insta)
+
+            for m in mes["messages"]:
+
+                if(m["sender_name"] != alter_username and m.get("content") is not None):
+                    num_messages = num_messages + 1
+                    # removing potential non-ascii characters
+                    sender_mes = ''.join(filter(lambda x: x in printable, m["content"]))
+                    # removing potential extra white spaces
+                    sender_mes = " ".join(sender_mes.split())
+                    # counting the words
+                    num_words = num_words + len(re.findall(r'\w+', sender_mes))
+                    # counting the chars
+                    num_chars = num_chars + len(sender_mes)
+                    # Comment out if you want to see message details
+                    # print(m["sender_name"], sender_mes, num_words, num_chars)
+
+                    # print(m["content"],''.join(filter(lambda x: x in printable, m["content"])),m["sender_name"])
+            print(alter_username, alter_insta, num_messages, num_words, num_chars)
+            out.append((alter_username, alter_insta, num_messages, num_words, num_chars))
 
     except TypeError as e:
         logger.error("TypeError: %s", e)
