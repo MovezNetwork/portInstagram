@@ -238,7 +238,7 @@ def extract_instagram(instagram_zip):
 
     if your_messages:
         df = pd.DataFrame(your_messages, columns=["alter_name", "alter_insta_username", "n_messages", "n_words", "n_chars"])
-        df = df.sort_values("n_chars",ascending=False)
+        df = df.sort_values("n_chars", ascending=False).reset_index(drop=True)
         result["your_messages"] = {"data":  df, "title": TABLE_TITLES["instagram_messages_summary"]}
 
     # extracting liked_posts file
@@ -249,6 +249,7 @@ def extract_instagram(instagram_zip):
 
     if liked_posts_dict and liked_posts_dict:
         df = instagram.liked_posts_comments_to_df(liked_posts_dict, liked_comments_dict)
+        df = df.sort_values("nliked_posts", ascending=False).reset_index(drop=True)
         if not df.empty:
             result["your_likes"] = {"data": df, "title": TABLE_TITLES["instagram_your_likes"]}
 
