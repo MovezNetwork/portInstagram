@@ -213,53 +213,44 @@ def extract_instagram(instagram_zip):
     #extracting personal information file
     pinfo_bytes = unzipddp.extract_file_from_zip(instagram_zip, "personal_information.json")
     pinfo_dict = unzipddp.read_json_from_bytes(pinfo_bytes)
-    your_pinfo = instagram.personal_information_to_list(pinfo_dict)
 
-    #extracting followers file
-    followers_bytes = unzipddp.extract_file_from_zip(instagram_zip, "followers_1.json")
-    followers_dict = unzipddp.read_json_from_bytes(followers_bytes)
-    #print('followers_dict followers_dict, ',followers_dict)
-    #extracting following_dict file
-    following_bytes = unzipddp.extract_file_from_zip(instagram_zip, "following.json")
-    following_dict = unzipddp.read_json_from_bytes(following_bytes)
+    if pinfo_dict:
+        your_pinfo = instagram.personal_information_to_list(pinfo_dict)
 
-    your_pinfo.append(instagram.followers_to_list(followers_dict))
-    your_pinfo.append(instagram.following_to_list(following_dict))
-    #print('your_pinfo ',your_pinfo)
-    if your_pinfo:
+        #extracting followers file
+        followers_bytes = unzipddp.extract_file_from_zip(instagram_zip, "followers_1.json")
+        followers_dict = unzipddp.read_json_from_bytes(followers_bytes)
+
+        #extracting following_dict file
+        following_bytes = unzipddp.extract_file_from_zip(instagram_zip, "following.json")
+        following_dict = unzipddp.read_json_from_bytes(following_bytes)
+
+        your_pinfo.append(instagram.followers_to_list(followers_dict))
+        your_pinfo.append(instagram.following_to_list(following_dict))
+    
         # We need to perform some data wrangling in this step
         df = pd.DataFrame([tuple(your_pinfo)], columns=["insta_name", "gender", "date of birth", "private account", "n_followers", "n_following"])
         result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"]}
 
+    # extracting messages
     messages_list_dict = unzipddp.extract_messages_from_zip(instagram_zip)
-    #print(len(messages_list_dict))
-    #print(messages_list_dict[0])
     your_messages = instagram.process_message_json(messages_list_dict)
 
-    df = pd.DataFrame(your_messages, columns=["alter_name", "alter_insta_username", "n_messages", "n_words", "n_chars"])
-    #print(df.dtypes)
-    # df[["n_messages", "n_words", "n_chars"]] = df[["n_messages", "n_words", "n_chars"]].apply(pd.to_numeric)
-    #print(df.dtypes)
-    #print('BEFORE SORT', df)
+    if your_messages:
+        df = pd.DataFrame(your_messages, columns=["alter_name", "alter_insta_username", "n_messages", "n_words", "n_chars"])
+        df = df.sort_values("n_chars",ascending=False)
+        result["your_messages"] = {"data":  df, "title": TABLE_TITLES["instagram_messages_summary"]}
 
-    df = df.sort_values("n_chars",ascending=False)
-    #print('AFTER SORT', df)
-    result["your_messages"] = {"data":  df, "title": TABLE_TITLES["instagram_messages_summary"]}
-    #print('pinfo_dict: ', your_pinfo)
-
-    #extracting liked_posts file
+    # extracting liked_posts file
     liked_posts_bytes = unzipddp.extract_file_from_zip(instagram_zip, "liked_posts.json")
     liked_posts_dict = unzipddp.read_json_from_bytes(liked_posts_bytes)
-    #print('liked_posts_dict, ',liked_posts_dict)
-    #extracting liked_comments file
     liked_comments_bytes = unzipddp.extract_file_from_zip(instagram_zip, "liked_comments.json")
     liked_comments_dict = unzipddp.read_json_from_bytes(liked_comments_bytes)
-    #print('liked_comments_dict, ',liked_comments_dict)
 
-    df = instagram.liked_posts_comments_to_df(liked_posts_dict,liked_comments_dict)
-
-    if not df.empty:
-        result["your_likes"] = {"data": df, "title": TABLE_TITLES["instagram_your_likes"]}
+    if liked_posts_dict and liked_posts_dict:
+        df = instagram.liked_posts_comments_to_df(liked_posts_dict, liked_comments_dict)
+        if not df.empty:
+            result["your_likes"] = {"data": df, "title": TABLE_TITLES["instagram_your_likes"]}
 
     return validation, result
 
