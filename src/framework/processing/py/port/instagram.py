@@ -10,6 +10,9 @@ import logging
 import zipfile
 import re
 import string
+import json
+from itertools import groupby
+import pandas as pd
 
 from port.validate import (
     DDPCategory,
@@ -173,7 +176,7 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
         if not isinstance(dict_with_pinfo, dict):
             raise TypeError("The input to this function was not dict")
 
-        # print('dict_with_pinfo: ',dict_with_pinfo)
+        #print('dict_with_pinfo: ',dict_with_pinfo)
         # dict_with_pinfo["profile_user"][0]["string_map_data"]["Username"]
         username = ''
         gender = ''
@@ -185,15 +188,13 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
             username = dict_with_pinfo["profile_user"][0]["string_map_data"]["Username"]["value"]
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Gebruikersnaam') is not None:
             username = dict_with_pinfo["profile_user"][0]["string_map_data"]["Gebruikersnaam"]["value"]
-        else:
-            print('username not found')
+
 
         if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Gender') is not None:
             gender = dict_with_pinfo["profile_user"][0]["string_map_data"]["Gender"]["value"]
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Geslacht') is not None:
             gender = dict_with_pinfo["profile_user"][0]["string_map_data"]["Geslacht"]["value"]
-        else:
-            print('gender not found')
+    
 
 
         # What is the english version of it? Get insta examples.
@@ -201,16 +202,14 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
             dateofbirth = dict_with_pinfo["profile_user"][0]["string_map_data"]["Dateofbirth"]["value"]
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Geboortedatum') is not None:
             dateofbirth = dict_with_pinfo["profile_user"][0]["string_map_data"]["Geboortedatum"]["value"]
-        else:
-            print('date of birth not found')
+
 
 
         if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Private Account') is not None:
             private_account = dict_with_pinfo["profile_user"][0]["string_map_data"]["Private Account"]["value"]
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get(u'PrivÃ©account') is not None:
             private_account = dict_with_pinfo["profile_user"][0]["string_map_data"][u"PrivÃ©account"]["value"]
-        else:
-            print('private_account not found')
+
 
         out.append(username)
         out.append(gender)
@@ -244,7 +243,7 @@ def followers_to_list(dict_with_followers: list[Any] | Any) -> list[str]:
         if not isinstance(dict_with_followers, list):
             raise TypeError("The input to this function was not dict followers_to_list")
 
-        print('Followers length ', len(dict_with_followers))
+        #print('Followers length ', len(dict_with_followers))
         out = len(dict_with_followers)
 
 
@@ -274,7 +273,7 @@ def following_to_list(dict_with_following: dict[Any, Any] | Any) -> list[str]:
         if not isinstance(dict_with_following, dict):
             raise TypeError("The input to this function was not dict")
 
-        print('Following length ', len(dict_with_following['relationships_following']))
+        #print('Following length ', len(dict_with_following['relationships_following']))
         out = len(dict_with_following['relationships_following'])
 
 
@@ -311,8 +310,8 @@ def process_message_json(messages_list_dict: list[Any] | Any) -> list[str]:
             num_chars = 0
             num_words = 0
             num_messages = 0
-            # print(mes["title"],mes["thread_path"],mes["thread_path"][6:mes["thread_path"].rfind("_")])
-            print('Chats with ', alter_username,alter_insta)
+            #print(mes["title"],mes["thread_path"],mes["thread_path"][6:mes["thread_path"].rfind("_")])
+            #print('Chats with ', alter_username,alter_insta)
 
             for m in mes["messages"]:
 
@@ -327,10 +326,10 @@ def process_message_json(messages_list_dict: list[Any] | Any) -> list[str]:
                     # counting the chars
                     num_chars = num_chars + len(sender_mes)
                     # Comment out if you want to see message details
-                    # print(m["sender_name"], sender_mes, num_words, num_chars)
+                    #print(m["sender_name"], sender_mes, num_words, num_chars)
 
-                    # print(m["content"],''.join(filter(lambda x: x in printable, m["content"])),m["sender_name"])
-            print(alter_username, alter_insta, num_messages, num_words, num_chars)
+                    #print(m["content"],''.join(filter(lambda x: x in #printable, m["content"])),m["sender_name"])
+            #print(alter_username, alter_insta, num_messages, num_words, num_chars)
             out.append((alter_username, alter_insta, num_messages, num_words, num_chars))
 
     except TypeError as e:
@@ -342,3 +341,22 @@ def process_message_json(messages_list_dict: list[Any] | Any) -> list[str]:
 
     finally:
         return out
+
+def liked_posts_comments_to_df(liked_posts_dict: dict[Any, Any], liked_comments_dict: dict[Any, Any] | Any) -> list[str]:
+    #print(liked_posts_dict,liked_comments_dict)
+    df_posts = pd.DataFrame(liked_posts_dict["likes_media_likes"])
+    df_posts = df_posts.groupby('title').count().reset_index()
+    df_posts.columns = ['alter_username', 'nliked_posts']
+
+    df_comments = pd.DataFrame(liked_comments_dict["likes_comment_likes"])
+    df_comments = df_comments.groupby('title').count().reset_index()
+    df_comments.columns = ['alter_username', 'nliked_comments']
+
+
+    df_likes = pd.merge(df_posts, df_comments, on="alter_username", how="outer")
+    df_likes = df_likes.fillna(0)
+    df_likes = df_likes.sort_values("nliked_posts",ascending=False)
+
+    #print('df_likes df_posts df_commentsshape', df_likes.shape,df_posts.shape,df_comments.shape)
+    #print('df.duplicated ',df_likes[df_likes.duplicated(['alter_username'])])
+    return df_likes

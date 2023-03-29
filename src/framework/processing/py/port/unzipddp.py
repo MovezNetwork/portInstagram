@@ -19,8 +19,8 @@ def extract_file_from_zip(zfile: str, file_to_extract: str) -> io.BytesIO:
     Function always returns a buffer
     """
     file_to_extract_bytes = io.BytesIO()
-    print('file_to_extract ', file_to_extract)
-    print('\n')
+    #print('file_to_extract ', file_to_extract)
+    #print('\n')
 
     try:
         with zipfile.ZipFile(zfile, "r") as zf:
@@ -29,7 +29,7 @@ def extract_file_from_zip(zfile: str, file_to_extract: str) -> io.BytesIO:
             for f in zf.namelist():
                 logger.debug("Contained in zip: %s", f)
                 if Path(f).name == file_to_extract:
-                    print('extract_file_from_zip found a message json', f)
+                    #print('extract_file_from_zip found a message json', f)
 
                     file_to_extract_bytes = io.BytesIO(zf.read(f))
                     file_found = True
@@ -70,7 +70,7 @@ def extract_messages_from_zip(zfile: str) -> list[Any]:
                     if('messages/inbox' in f):
                         file_to_extract_bytes = io.BytesIO(zf.read(f))
                         found_chats.append(read_json_from_bytes(file_to_extract_bytes))
-                        print('getting message file ', f)
+                        #print('getting message file ', f)
                         file_found = True
 
         if not file_found:
