@@ -87,7 +87,7 @@ export const SplashScreen = (props: Props): JSX.Element => {
           Via deze website kun je veilig je sociale media gesprekken delen met de onderzoekers van de Erasmus Universiteit Rotterdam.
         </div>
         <div className='mb-4'>
-          We leggen eerst stap voor stap wat er van je verwacht wordt. In de vragenlijst heb je aangegeven met welke mensen in je klas je het meest omgaat.  Daarin werd ook gevraagd om van deze mensen de WhatsApp chats te exporteren.
+          We leggen eerst stap voor stap wat er van je verwacht wordt. In de vragenlijst heb je aangegeven met welke mensen in je klas je het meest omgaat.  Daarin werd ook gevraagd om van deze mensen de Instagram data te exporteren.
         </div>
 
         <div className='flex flex-col gap-3 mb-6'>
@@ -98,7 +98,7 @@ export const SplashScreen = (props: Props): JSX.Element => {
             <div>Vervolgens zie je de data zoals deze gedeeld zal worden, waarin informatie zoals namen verwijderd zijn. Hier kun je ook kiezen om berichten niet te delen met ons door ze te verwijderen. Ook kun je de zoekfunctie gebruiken om bepaalde berichten te zoeken en te verwijderen.  </div>
           </Bullet>
           <Bullet>
-            <div>Pas als je op de knop "Versturen" klikt, worden de gegevens verstuurd en opgeslagen. Door op de knop “Versturen” te klikken geef je aan goed geïnformeerd te zijn over het onderzoek en vrijwillig je WhatsApp chats te delen. </div>
+            <div>Pas als je op de knop "Versturen" klikt, worden de gegevens verstuurd en opgeslagen. Door op de knop “Versturen” te klikken geef je aan goed geïnformeerd te zijn over het onderzoek en vrijwillig je Instagram data te delen. </div>
           </Bullet>
         </div>
 

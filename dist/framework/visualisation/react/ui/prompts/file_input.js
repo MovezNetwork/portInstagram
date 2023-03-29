@@ -67,10 +67,10 @@ var selectButtonLabel = function () {
 var note = function () {
     return new TextBundle()
         .add('en', 'Note: The process to extract the correct data from the file is done on your own computer. No data is stored or sent yet.')
-        .add('nl', 'Volg de download instructies en kies het bestand dat u opgeslagen heeft op uw apparaat. Als u geen Whatsapp bestand heeft klik dan op “Overslaan” rechts onder. NB: Het proces om de juiste gegevens uit het bestand te halen gebeurt op uw eigen computer. Er worden nog geen gegevens opgeslagen of verstuurd.');
+        .add('nl', 'Volg de download instructies en kies het bestand dat u opgeslagen heeft op uw apparaat. Als u geen Instagram bestand heeft klik dan op “Overslaan” rechts onder. NB: Het proces om de juiste gegevens uit het bestand te halen gebeurt op uw eigen computer. Er worden nog geen gegevens opgeslagen of verstuurd.');
 };
 var placeholder = function () {
     return new TextBundle()
-        .add('en', 'Whatsapp file selection')
-        .add('nl', 'Whatsapp-bestandsselectie');
+        .add('en', 'Instagram file selection')
+        .add('nl', 'Instagram-bestandsselectie');
 };
