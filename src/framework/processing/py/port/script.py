@@ -227,9 +227,9 @@ def extract_instagram(instagram_zip):
 
         your_pinfo.append(instagram.followers_to_list(followers_dict))
         your_pinfo.append(instagram.following_to_list(following_dict))
-    
+
         # We need to perform some data wrangling in this step
-        df = pd.DataFrame([tuple(your_pinfo)], columns=["insta_name", "gender", "date of birth", "private account", "n_followers", "n_following"])
+        df = pd.DataFrame([tuple(your_pinfo)], columns=["Username", "Hashed Username","Display Name","Hashed Display Name","Gender", "Date of birth", "Private account", "Number Followers", "Number Following"])
         result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"]}
 
     # extracting messages
@@ -237,8 +237,8 @@ def extract_instagram(instagram_zip):
     your_messages = instagram.process_message_json(messages_list_dict)
 
     if your_messages:
-        df = pd.DataFrame(your_messages, columns=["alter_name", "alter_insta_username", "n_messages", "n_words", "n_chars"])
-        df = df.sort_values("n_chars", ascending=False).reset_index(drop=True)
+        df = pd.DataFrame(your_messages, columns=["Display Name","Hashed Display Name", "Number of Messages", "Number of Words", "Number of Characters"])
+        df = df.sort_values("Number of Characters", ascending=False).reset_index(drop=True)
         result["your_messages"] = {"data":  df, "title": TABLE_TITLES["instagram_messages_summary"]}
 
     # extracting liked_posts file
@@ -249,7 +249,7 @@ def extract_instagram(instagram_zip):
 
     if liked_posts_dict and liked_posts_dict:
         df = instagram.liked_posts_comments_to_df(liked_posts_dict, liked_comments_dict)
-        df = df.sort_values("nliked_posts", ascending=False).reset_index(drop=True)
+        df = df.sort_values("Number Liked Posts", ascending=False).reset_index(drop=True)
         if not df.empty:
             result["your_likes"] = {"data": df, "title": TABLE_TITLES["instagram_your_likes"]}
 
@@ -266,7 +266,6 @@ def render_end_page():
 
 def render_donation_page(platform, body, progress):
     header = props.PropsUIHeader(props.Translatable({"en": platform, "nl": platform}))
-
     footer = props.PropsUIFooter(progress)
     page = props.PropsUIPageDonation(platform, header, body, footer)
     return CommandUIRender(page)

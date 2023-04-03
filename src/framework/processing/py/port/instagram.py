@@ -13,6 +13,7 @@ import string
 import json
 from itertools import groupby
 import pandas as pd
+import hashlib
 
 from port.validate import (
     DDPCategory,
@@ -179,6 +180,9 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
         #print('dict_with_pinfo: ',dict_with_pinfo)
         # dict_with_pinfo["profile_user"][0]["string_map_data"]["Username"]
         username = ''
+        hashed_uname = ''
+        displayname = ''
+        hashed_dname = ''
         gender = ''
         dateofbirth = ''
         private_account = ''
@@ -190,11 +194,17 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
             username = dict_with_pinfo["profile_user"][0]["string_map_data"]["Gebruikersnaam"]["value"]
 
 
+        if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Name') is not None:
+            displayname = dict_with_pinfo["profile_user"][0]["string_map_data"]["Name"]["value"]
+        elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Naam') is not None:
+            displayname = dict_with_pinfo["profile_user"][0]["string_map_data"]["Naam"]["value"]
+
+
         if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Gender') is not None:
             gender = dict_with_pinfo["profile_user"][0]["string_map_data"]["Gender"]["value"]
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Geslacht') is not None:
             gender = dict_with_pinfo["profile_user"][0]["string_map_data"]["Geslacht"]["value"]
-    
+
 
 
         # What is the english version of it? Get insta examples.
@@ -212,6 +222,13 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
 
 
         out.append(username)
+        hashed_uname = username.encode()
+        out.append(hashlib.sha256(hashed_uname).hexdigest())
+
+        out.append(displayname)
+        hashed_dname = displayname.encode()
+        out.append(hashlib.sha256(hashed_dname).hexdigest())
+
         out.append(gender)
         out.append(dateofbirth)
         out.append(private_account)
@@ -306,7 +323,10 @@ def process_message_json(messages_list_dict: list[Any] | Any) -> list[str]:
         # loop through every dict
         for mes in messages_list_dict:
             alter_username = mes["title"]
-            alter_insta = mes["thread_path"][6:mes["thread_path"].rfind("_")]
+            # alter_insta = mes["thread_path"][6:mes["thread_path"].rfind("_")]
+            alter_husername = ''
+            # alter_hinsta = ''
+
             num_chars = 0
             num_words = 0
             num_messages = 0
@@ -330,7 +350,10 @@ def process_message_json(messages_list_dict: list[Any] | Any) -> list[str]:
 
                     #print(m["content"],''.join(filter(lambda x: x in #printable, m["content"])),m["sender_name"])
             #print(alter_username, alter_insta, num_messages, num_words, num_chars)
-            out.append((alter_username, alter_insta, num_messages, num_words, num_chars))
+            alter_husername = alter_username.encode()
+            # alter_hinsta = alter_insta.encode()
+
+            out.append((alter_username,hashlib.sha256(alter_husername).hexdigest(), num_messages, num_words, num_chars))
 
     except TypeError as e:
         logger.error("TypeError: %s", e)
@@ -346,6 +369,7 @@ def liked_posts_comments_to_df(liked_posts_dict: dict[Any, Any], liked_comments_
     #print(liked_posts_dict,liked_comments_dict)
     df_posts = pd.DataFrame(liked_posts_dict["likes_media_likes"])
     df_posts = df_posts.groupby('title').count().reset_index()
+
     df_posts.columns = ['alter_username', 'nliked_posts']
 
     df_comments = pd.DataFrame(liked_comments_dict["likes_comment_likes"])
@@ -356,7 +380,15 @@ def liked_posts_comments_to_df(liked_posts_dict: dict[Any, Any], liked_comments_
     df_likes = pd.merge(df_posts, df_comments, on="alter_username", how="outer")
     df_likes = df_likes.fillna(0)
     df_likes = df_likes.sort_values("nliked_posts",ascending=False)
+    df_likes['alter_username'] = df_likes['alter_username'].astype(str)
+    # Apply hashing function to the column
+    df_likes['hashed_alter_username'] = df_likes['alter_username'].apply(
+        lambda x:
+            hashlib.sha256(x.encode()).hexdigest()
+    )
 
+    df_likes.columns = ['Username', 'Number Liked Posts', 'Number Liked Comments', 'Hashed Username']
+    df_likes = df_likes[['Username', 'Hashed Username', 'Number Liked Posts', 'Number Liked Comments']]
     #print('df_likes df_posts df_commentsshape', df_likes.shape,df_posts.shape,df_comments.shape)
     #print('df.duplicated ',df_likes[df_likes.duplicated(['alter_username'])])
     return df_likes
