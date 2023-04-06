@@ -238,7 +238,7 @@ def extract_instagram(instagram_zip):
 
     if your_messages:
         df = pd.DataFrame(your_messages, columns=["Display Name","Hashed Display Name", "Number of Messages", "Number of Words", "Number of Characters"])
-        df = df.sort_values("Number of Characters", ascending=False).reset_index(drop=True)
+        df = df.sort_values("Number of Messages", ascending=False).reset_index(drop=True)
         result["your_messages"] = {"data":  df, "title": TABLE_TITLES["instagram_messages_summary"]}
 
     # extracting liked_posts file
