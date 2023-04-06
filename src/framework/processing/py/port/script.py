@@ -166,8 +166,8 @@ def prompt_consent(platform_name, data):
 
     for k, v in data.items():
         df = v["data"]
-        #print('prompt_consent dataframe', df)
-        table = props.PropsUIPromptConsentFormTable(f"{platform_name}_{k}", v["title"], df)
+        adjustable = v.get("adjustable", True)
+        table = props.PropsUIPromptConsentFormTable(f"{platform_name}_{k}", v["title"], df, adjustable)
         table_list.append(table)
 
     return props.PropsUIPromptConsentForm(table_list, [])
@@ -230,7 +230,7 @@ def extract_instagram(instagram_zip):
 
         # We need to perform some data wrangling in this step
         df = pd.DataFrame([tuple(your_pinfo)], columns=["Username", "Hashed Username","Display Name","Hashed Display Name","Gender", "Date of birth", "Private account", "Number Followers", "Number Following"])
-        result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"]}
+        result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"], "adjustable": False}
 
     # extracting messages
     messages_list_dict = unzipddp.extract_messages_from_zip(instagram_zip)
