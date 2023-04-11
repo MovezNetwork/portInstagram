@@ -18,7 +18,6 @@ interface TableContext {
 }
 
 export const ConsentForm = (props: Props): JSX.Element => {
-  console.log(`PROPS IN CONSENTFORM ${props}`)
   const tablesIn = React.useRef<Array<PropsUITable & TableContext>>(parseTables(props.tables))
   const metaTables = React.useRef<Array<PropsUITable & TableContext>>(parseTables(props.metaTables))
   const tablesOut = React.useRef<Array<PropsUITable & TableContext>>(tablesIn.current)

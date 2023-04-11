@@ -17,5 +17,5 @@ export function isPropsUIPromptConsentForm(arg) {
     return isInstanceOf(arg, 'PropsUIPromptConsentForm', ['tables', 'metaTables']);
 }
 export function isPropsUIPromptConsentFormTable(arg) {
-    return isInstanceOf(arg, 'PropsUIPromptConsentFormTable', ['id', 'title', 'description', 'data_frame']);
+    return isInstanceOf(arg, 'PropsUIPromptConsentFormTable', ['id', 'title', 'description', 'data_frame', 'adjustable']);
 }

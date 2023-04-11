@@ -6,5 +6,5 @@ declare type Props = Weak<PropsUITable> & TableContext & ReactFactoryContext;
 export interface TableContext {
     onChange: (id: string, rows: PropsUITableRow[]) => void;
 }
-export declare const Table: ({ id, head, body, readOnly, pageSize, locale, onChange }: Props) => JSX.Element;
+export declare const Table: ({ id, head, body, readOnly, adjustable, pageSize, locale, onChange }: Props) => JSX.Element;
 export {};

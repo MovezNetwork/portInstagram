@@ -42,7 +42,6 @@ interface State {
 }
 
 export const Table = ({ id, head, body, readOnly = false, adjustable, pageSize = 14, locale, onChange }: Props): JSX.Element => {
-  console.log(`THE STATE OF ADJUSABLE IS ${adjustable}`)
   const pageWindowLegSize = 2
 
   const query = React.useRef<string[]>([])

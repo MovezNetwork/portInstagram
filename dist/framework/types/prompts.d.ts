@@ -33,5 +33,6 @@ export interface PropsUIPromptConsentFormTable {
     title: Text;
     description: Text;
     data_frame: any;
+    adjustable: boolean;
 }
 export declare function isPropsUIPromptConsentFormTable(arg: any): arg is PropsUIPromptConsentFormTable;

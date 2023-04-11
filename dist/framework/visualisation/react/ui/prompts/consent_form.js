@@ -64,13 +64,14 @@ export var ConsentForm = function (props) {
     }
     function parseTable(tableData) {
         var id = tableData.id;
+        var adjustable = tableData.adjustable;
         var title = Translator.translate(tableData.title, props.locale);
         var deletedRowCount = 0;
         var dataFrame = JSON.parse(tableData.data_frame);
         var headCells = columnNames(dataFrame).map(function (column) { return headCell(dataFrame, column); });
         var head = { __type__: 'PropsUITableHead', cells: headCells };
         var body = { __type__: 'PropsUITableBody', rows: rows(dataFrame) };
-        return { __type__: 'PropsUITable', id: id, head: head, body: body, title: title, deletedRowCount: deletedRowCount };
+        return { __type__: 'PropsUITable', id: id, head: head, body: body, title: title, adjustable: adjustable, deletedRowCount: deletedRowCount };
     }
     function renderTable(table, readOnly) {
         if (readOnly === void 0) { readOnly = false; }

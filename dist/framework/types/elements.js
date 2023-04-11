@@ -117,7 +117,7 @@ export function isPropsUIFooter(arg) {
     return isInstanceOf(arg, 'PropsUIFooter', ['progressPercentage']);
 }
 export function isPropsUITable(arg) {
-    return isInstanceOf(arg, 'PropsUITable', ['readOnly', 'pageSize', 'id', 'head', 'body']);
+    return isInstanceOf(arg, 'PropsUITable', ['readOnly', 'pageSize', 'adjustable', 'id', 'head', 'body']);
 }
 export function isPropsUITableHead(arg) {
     return isInstanceOf(arg, 'PropsUITableHead', ['cells']);

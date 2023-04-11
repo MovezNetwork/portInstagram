@@ -183,6 +183,7 @@ export interface PropsUITable {
     head: PropsUITableHead;
     body: PropsUITableBody;
     readOnly?: boolean;
+    adjustable?: boolean;
     pageSize?: number;
 }
 export declare function isPropsUITable(arg: any): arg is PropsUITable;
