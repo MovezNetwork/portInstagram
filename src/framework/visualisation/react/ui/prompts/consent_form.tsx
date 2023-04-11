@@ -18,6 +18,7 @@ interface TableContext {
 }
 
 export const ConsentForm = (props: Props): JSX.Element => {
+  console.log(`PROPS IN CONSENTFORM ${props}`)
   const tablesIn = React.useRef<Array<PropsUITable & TableContext>>(parseTables(props.tables))
   const metaTables = React.useRef<Array<PropsUITable & TableContext>>(parseTables(props.metaTables))
   const tablesOut = React.useRef<Array<PropsUITable & TableContext>>(tablesIn.current)
@@ -68,6 +69,7 @@ export const ConsentForm = (props: Props): JSX.Element => {
 
   function parseTable (tableData: PropsUIPromptConsentFormTable): (PropsUITable & TableContext) {
     const id = tableData.id
+    const adjustable = tableData.adjustable
     const title = Translator.translate(tableData.title, props.locale)
     const deletedRowCount = 0
     const dataFrame = JSON.parse(tableData.data_frame)
@@ -75,7 +77,7 @@ export const ConsentForm = (props: Props): JSX.Element => {
     const head: PropsUITableHead = { __type__: 'PropsUITableHead', cells: headCells }
     const body: PropsUITableBody = { __type__: 'PropsUITableBody', rows: rows(dataFrame) }
 
-    return { __type__: 'PropsUITable', id, head, body, title, deletedRowCount }
+    return { __type__: 'PropsUITable', id, head, body, title, adjustable, deletedRowCount }
   }
 
   function renderTable (table: (Weak<PropsUITable> & TableContext), readOnly = false): JSX.Element {

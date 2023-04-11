@@ -69,12 +69,13 @@ class PropsUIPromptConsentForm:
 
 
 class PropsUIPromptConsentFormTable:
-    __slots__ = "id", "title", "data_frame"
+    __slots__ = "id", "title", "data_frame", "adjustable"
 
-    def __init__(self, id, title, data_frame):
+    def __init__(self, id, title, data_frame, adjustable=True):
         self.id = id
         self.title = title
         self.data_frame = data_frame
+        self.adjustable = adjustable
 
     def toDict(self):
         dict = {}
@@ -82,6 +83,7 @@ class PropsUIPromptConsentFormTable:
         dict["id"] = self.id
         dict["title"] = self.title.toDict()
         dict["data_frame"] = self.data_frame.to_json()
+        dict["adjustable"] = self.adjustable
         return dict
 
 

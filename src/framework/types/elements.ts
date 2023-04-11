@@ -348,10 +348,11 @@ export interface PropsUITable {
   head: PropsUITableHead
   body: PropsUITableBody
   readOnly?: boolean
+  adjustable?: boolean
   pageSize?: number
 }
 export function isPropsUITable (arg: any): arg is PropsUITable {
-  return isInstanceOf<PropsUITable>(arg, 'PropsUITable', ['readOnly', 'pageSize', 'id', 'head', 'body'])
+  return isInstanceOf<PropsUITable>(arg, 'PropsUITable', ['readOnly', 'pageSize', 'adjustable', 'id', 'head', 'body'])
 }
 
 export interface PropsUITableHead {

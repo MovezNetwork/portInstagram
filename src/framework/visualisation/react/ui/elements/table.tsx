@@ -23,6 +23,7 @@ interface Visibility {
   search: boolean
   undo: boolean
   delete: boolean
+  adjustable: boolean
   table: boolean
   noData: boolean
   noDataLeft: boolean
@@ -40,7 +41,8 @@ interface State {
   visibility: Visibility
 }
 
-export const Table = ({ id, head, body, readOnly = false, pageSize = 7, locale, onChange }: Props): JSX.Element => {
+export const Table = ({ id, head, body, readOnly = false, adjustable, pageSize = 14, locale, onChange }: Props): JSX.Element => {
+  console.log(`THE STATE OF ADJUSABLE IS ${adjustable}`)
   const pageWindowLegSize = 2
 
   const query = React.useRef<string[]>([])
@@ -58,6 +60,7 @@ export const Table = ({ id, head, body, readOnly = false, pageSize = 7, locale, 
     visibility: {
       search: alteredRows.current.length > pageSize,
       delete: false,
+      adjustable: adjustable ?? true,
       undo: false,
       table: filteredRows.current.length > 0,
       noData: filteredRows.current.length === 0,
@@ -426,7 +429,7 @@ export const Table = ({ id, head, body, readOnly = false, pageSize = 7, locale, 
         <Title3 text={copy.noResults} color='text-grey3' margin='' />
       </div>
       <div className={`flex flex-row items-center gap-6 mt-2 h-8 ${body.rows.length === 0 ? 'hidden' : ''} `}>
-        <div className='flex flex-row gap-4 items-center'>
+        <div className={`flex flex-row gap-4 items-center ${display('adjustable')}`}>
           <CheckBox id='edit' selected={state.edit} onSelect={handleEditToggle} />
           <Label text={copy.edit} margin='mt-1px' />
         </div>
@@ -436,7 +439,7 @@ export const Table = ({ id, head, body, readOnly = false, pageSize = 7, locale, 
 
       </div>
       <div className={`flex flex-row items-center gap-6 mt-2 h-8 ${body.rows.length === 0 ? 'hidden' : ''} `}>
-        <div className='flex flex-row gap-4 items-center'>
+        <div className={`flex flex-row gap-4 items-center ${display('adjustable')}`}>
           <Label text={copy.deleted} />
           <div className={`${display('undo')}`}>
             <IconLabelButton label={copy.undo} color='text-primary' icon={UndoSvg} onClick={handleUndo} />
