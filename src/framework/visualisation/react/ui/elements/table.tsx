@@ -68,12 +68,18 @@ export const Table = ({ id, head, body, readOnly = false, adjustable, pageSize =
     }
   }
 
+
   const [state, setState] = React.useState<State>(initialState)
 
   const copy = prepareCopy(locale)
 
   function display (element: keyof Visibility): string {
     return visible(element) ? '' : 'hidden'
+  }
+
+  function matchColsThatStartWithHashed (props: Weak<PropsUITableHead>): Array<boolean> {
+    const regex : RegExp = /^Hashed.*/;
+    return props.cells.map((cell) => regex.test(cell.text))
   }
 
   function visible (element: keyof Visibility): boolean {
@@ -128,11 +134,24 @@ export const Table = ({ id, head, body, readOnly = false, adjustable, pageSize =
     return filteredRows.current.slice(offset, offset + pageSize)
   }
 
+
+// ######################################################
   function renderHeadRow (props: Weak<PropsUITableHead>): JSX.Element {
+
+        let cells : JSX.Element[] = []
+        const colsThatStartWithHashed : Array<boolean> = matchColsThatStartWithHashed(head)
+
+        props.cells.forEach((cell, index) => { 
+            if (colsThatStartWithHashed[index] === false) {
+                cells.push(renderHeadCell(cell, index))
+                console.log(index)
+            }
+        })
+
     return (
       <tr>
         {state.edit ? renderHeadCheck() : ''}
-        {props.cells.map((cell, index) => renderHeadCell(cell, index))}
+        {cells}
       </tr>
     )
   }
@@ -158,11 +177,22 @@ export const Table = ({ id, head, body, readOnly = false, adjustable, pageSize =
     return state.rows.map((row, index) => renderRow(row, index))
   }
 
+// ######################################################
   function renderRow (row: PropsUITableRow, rowIndex: number): JSX.Element {
+
+    let cells : JSX.Element[] = []
+    const colsThatStartWithHashed : Array<boolean> = matchColsThatStartWithHashed(head)
+
+    row.cells.forEach((cell, index) => { 
+        if (colsThatStartWithHashed[index] === false) {
+            cells.push(renderRowCell(cell, index))
+        }
+    })
+
     return (
       <tr key={`${rowIndex}`} className='hover:bg-grey6'>
         {state.edit ? renderRowCheck(row.id) : ''}
-        {row.cells.map((cell, cellIndex) => renderRowCell(cell, cellIndex))}
+        {cells}
       </tr>
     )
   }
