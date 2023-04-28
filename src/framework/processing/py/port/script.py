@@ -9,6 +9,7 @@ from port.api.commands import (CommandSystemDonate, CommandUIRender)
 
 import port.instagram as instagram
 import port.unzipddp as unzipddp
+from port.validate import DDPFiletype
 
 LOG_STREAM = io.StringIO()
 
@@ -194,21 +195,25 @@ def donate_logs(key):
 
 
 def extract_instagram(instagram_zip):
-    """
-    USE THE IMPORTEDFUNCTIONS FROM port.instagram HERE
-
-    I LEFT SOME EXAMPLES
-    """
-    result = {}
 
     validation = instagram.validate_zip(instagram_zip)
+    result = {}
 
-    # interests_bytes = unzipddp.extract_file_from_zip(instagram_zip, "ads_interests.json")
-    # interests_dict = unzipddp.read_json_from_bytes(interests_bytes)
-    # interests = instagram.interests_to_list(interests_dict)
-    # if interests:
-    #     df = pd.DataFrame(interests, columns=["Interests"])
-    #     result["interests"] = {"data": df, "title": TABLE_TITLES["instagram_interests"]}
+    if validation.ddp_category is None:
+        pass
+    elif validation.ddp_category.ddp_filetype == DDPFiletype.JSON:
+        result = extract_instagram_json(instagram_zip)
+    elif validation.ddp_category.ddp_filetype == DDPFiletype.HTML:
+        result = extract_instagram_html(instagram_zip)
+
+    return validation, result
+
+
+##############################################################
+# Extract json
+
+def extract_instagram_json(instagram_zip):
+    result = {}
 
     #extracting personal information file
     pinfo_bytes = unzipddp.extract_file_from_zip(instagram_zip, "personal_information.json")
@@ -228,7 +233,6 @@ def extract_instagram(instagram_zip):
         your_pinfo.append(instagram.followers_to_list(followers_dict))
         your_pinfo.append(instagram.following_to_list(following_dict))
 
-        # We need to perform some data wrangling in this step
         df = pd.DataFrame([tuple(your_pinfo)], columns=["Username", "Hashed Username","Display Name","Hashed Display Name","Gender", "Date of birth", "Private account", "Number Followers", "Number Following"])
         result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"], "adjustable": False}
 
@@ -253,8 +257,52 @@ def extract_instagram(instagram_zip):
         if not df.empty:
             result["your_likes"] = {"data": df, "title": TABLE_TITLES["instagram_your_likes"]}
 
-    return validation, result
+    return result
 
+##############################################################
+# Extract html
+
+def extract_instagram_html(instagram_zip):
+    result = {}
+
+    # extracting personal information file
+    pinfo_bytes = unzipddp.extract_file_from_zip(instagram_zip, "personal_information.html")
+    your_pinfo = instagram.personal_information_to_list_html(pinfo_bytes)
+
+    if your_pinfo:
+
+        # add n followers
+        followers_bytes = unzipddp.extract_file_from_zip(instagram_zip, "followers_1.html")
+        followers = instagram.followers_to_list_html(followers_bytes)
+        your_pinfo.append(followers)
+
+        # add n following
+        following_bytes = unzipddp.extract_file_from_zip(instagram_zip, "following.html")
+        following = instagram.followers_to_list_html(following_bytes)
+        your_pinfo.append(following)
+
+        df = pd.DataFrame([tuple(your_pinfo)], columns=["Username", "Hashed Username","Display Name","Hashed Display Name","Gender", "Date of birth", "Private account", "Number Followers", "Number Following"])
+        result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"], "adjustable": False}
+
+    # extracting messages
+    your_messages = instagram.process_message_html(instagram_zip)
+
+    if your_messages:
+        df = pd.DataFrame(your_messages, columns=["Display Name","Hashed Display Name", "Number of Messages", "Number of Words", "Number of Characters"])
+        df = df.sort_values("Number of Messages", ascending=False).reset_index(drop=True)
+        result["your_messages"] = {"data":  df, "title": TABLE_TITLES["instagram_messages_summary"]}
+
+    # extracting liked_posts file
+    liked_posts_bytes = unzipddp.extract_file_from_zip(instagram_zip, "liked_posts.html")
+    liked_comments_bytes = unzipddp.extract_file_from_zip(instagram_zip, "liked_comments.html")
+
+    df = instagram.liked_posts_comments_to_df_html(liked_posts_bytes, liked_comments_bytes)
+    if not df.empty:
+        df = df.sort_values("Number Liked Posts", ascending=False).reset_index(drop=True)
+        if not df.empty:
+            result["your_likes"] = {"data": df, "title": TABLE_TITLES["instagram_your_likes"]}
+
+    return result
 
 ##########################################
 # Functions provided by Eyra did not change
