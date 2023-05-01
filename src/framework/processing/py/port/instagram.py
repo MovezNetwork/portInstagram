@@ -186,40 +186,51 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
         gender = ''
         dateofbirth = ''
         private_account = ''
+        jsonString = ''
 
         # we are handling english and dutch only for now
         if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Username') is not None:
             username = dict_with_pinfo["profile_user"][0]["string_map_data"]["Username"]["value"]
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Gebruikersnaam') is not None:
             username = dict_with_pinfo["profile_user"][0]["string_map_data"]["Gebruikersnaam"]["value"]
+        else:
+            #saving the whole json
+            jsonString = json.dumps(dict_with_pinfo["profile_user"][0]["string_map_data"])
+
 
 
         if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Name') is not None:
             displayname = dict_with_pinfo["profile_user"][0]["string_map_data"]["Name"]["value"]
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Naam') is not None:
             displayname = dict_with_pinfo["profile_user"][0]["string_map_data"]["Naam"]["value"]
-
+        else:
+            #saving the whole json
+            jsonString = json.dumps(dict_with_pinfo["profile_user"][0]["string_map_data"])
 
         if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Gender') is not None:
             gender = dict_with_pinfo["profile_user"][0]["string_map_data"]["Gender"]["value"]
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Geslacht') is not None:
             gender = dict_with_pinfo["profile_user"][0]["string_map_data"]["Geslacht"]["value"]
-
-
+        else:
+            #saving the whole json
+            jsonString = json.dumps(dict_with_pinfo["profile_user"][0]["string_map_data"])
 
         # What is the english version of it? Get insta examples.
-        if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Dateofbirth') is not None:
-            dateofbirth = dict_with_pinfo["profile_user"][0]["string_map_data"]["Dateofbirth"]["value"]
+        if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Date of birth') is not None:
+            dateofbirth = dict_with_pinfo["profile_user"][0]["string_map_data"]["Date of birth"]["value"]
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Geboortedatum') is not None:
             dateofbirth = dict_with_pinfo["profile_user"][0]["string_map_data"]["Geboortedatum"]["value"]
-
+        else:
+            jsonString = json.dumps(dict_with_pinfo["profile_user"][0]["string_map_data"])
 
 
         if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Private Account') is not None:
             private_account = dict_with_pinfo["profile_user"][0]["string_map_data"]["Private Account"]["value"]
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get(u'PrivÃ©account') is not None:
             private_account = dict_with_pinfo["profile_user"][0]["string_map_data"][u"PrivÃ©account"]["value"]
-
+        else:
+            #saving the whole json
+            jsonString = json.dumps(dict_with_pinfo["profile_user"][0]["string_map_data"])
 
         out.append(username)
         hashed_uname = username.encode()
@@ -232,6 +243,7 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
         out.append(gender)
         out.append(dateofbirth)
         out.append(private_account)
+        out.append(jsonString)
 
 
 
