@@ -305,27 +305,29 @@ def process_message_json(messages_list_dict: list[Any] | Any) -> list[str]:
             #print(mes["title"],mes["thread_path"],mes["thread_path"][6:mes["thread_path"].rfind("_")])
             #print('Chats with ', alter_username,alter_insta)
 
-            for m in mes["messages"]:
+            #skipping all the group chats
+            if(len(mes["participants"])==2):
+                for m in mes["messages"]:
 
-                if(m["sender_name"] != alter_username and m.get("content") is not None):
-                    num_messages = num_messages + 1
-                    # removing potential non-ascii characters
-                    sender_mes = ''.join(filter(lambda x: x in printable, m["content"]))
-                    # removing potential extra white spaces
-                    sender_mes = " ".join(sender_mes.split())
-                    # counting the words
-                    num_words = num_words + len(re.findall(r'\w+', sender_mes))
-                    # counting the chars
-                    num_chars = num_chars + len(sender_mes)
-                    # Comment out if you want to see message details
-                    #print(m["sender_name"], sender_mes, num_words, num_chars)
+                    if(m["sender_name"] != alter_username and m.get("content") is not None):
+                        num_messages = num_messages + 1
+                        # removing potential non-ascii characters
+                        sender_mes = ''.join(filter(lambda x: x in printable, m["content"]))
+                        # removing potential extra white spaces
+                        sender_mes = " ".join(sender_mes.split())
+                        # counting the words
+                        num_words = num_words + len(re.findall(r'\w+', sender_mes))
+                        # counting the chars
+                        num_chars = num_chars + len(sender_mes)
+                        # Comment out if you want to see message details
+                        #print(m["sender_name"], sender_mes, num_words, num_chars)
 
-                    #print(m["content"],''.join(filter(lambda x: x in #printable, m["content"])),m["sender_name"])
-            #print(alter_username, alter_insta, num_messages, num_words, num_chars)
-            alter_husername = alter_username.encode()
-            # alter_hinsta = alter_insta.encode()
+                        #print(m["content"],''.join(filter(lambda x: x in #printable, m["content"])),m["sender_name"])
+                #print(alter_username, alter_insta, num_messages, num_words, num_chars)
+                alter_husername = alter_username.encode()
+                # alter_hinsta = alter_insta.encode()
 
-            out.append((alter_username,hashlib.sha256(alter_husername).hexdigest(), num_messages, num_words, num_chars))
+                out.append((alter_username,hashlib.sha256(alter_husername).hexdigest(), num_messages, num_words, num_chars))
 
     except TypeError as e:
         logger.error("TypeError: %s", e)
@@ -340,8 +342,8 @@ def process_message_json(messages_list_dict: list[Any] | Any) -> list[str]:
 
 def process_messages(html: bytes) -> list[Any]:
     """
-    Extracts the relevant characteristics from an html 
-    containing messages (message_1.html) 
+    Extracts the relevant characteristics from an html
+    containing messages (message_1.html)
     """
     printable = set(string.printable)
 
@@ -488,7 +490,3 @@ def liked_posts_comments_to_df_html(posts_html: io.BytesIO, comments_html: io.By
         logger.error("Error: %s", e)
 
     return out
-
-
-
-
