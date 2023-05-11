@@ -87,18 +87,17 @@ export const SplashScreen = (props: Props): JSX.Element => {
           Via deze website kun je veilig je sociale media gesprekken delen met de onderzoekers van de Erasmus Universiteit Rotterdam.
         </div>
         <div className='mb-4'>
-          We leggen eerst stap voor stap wat er van je verwacht wordt. In de vragenlijst heb je aangegeven met welke mensen in je klas je het meest omgaat.  Daarin werd ook gevraagd om van deze mensen de Instagram data te exporteren.
+          Deze keer vragen we om de gehele Instagram data (als .zip bestand) met ons te delen. Deze website zal alleen de personen waarmee je praat op Instagram opslaan en hoevaak je met deze mensen praat. Alle namen worden vervangen door codes zodat er wij niet weten wie het zijn. Foto's en video's worden nooit met ons gedeeld, ook niet als deze voorkomen in de gesprekken.
         </div>
-
+        <div className='mb-4'>
+          We leggen stap voor stap uit hoe je dit kunt doen.
+          </div>
         <div className='flex flex-col gap-3 mb-6'>
           <Bullet>
-            <div>Aller eerst  selecteer je jouw naam. Het is belangrijk dat je je eigen naam selecteert zodat je niet per ongeluk de gegevens van iemand anders met ons deelt. </div>
+            <div> Eerst sleep je het .zip bestand in het kader, of kies je het .zip bestand vanaf je computer. Vervolgens zie je de gegevens zoals deze gedeeld zullen worden. Hier kun je ook kiezen om bepaalde mensen niet met ons te delen  door ze te verwijderen. Je  kunt hiervoor de zoekfunctie gebruiken om bepaalde mensen te zoeken en te verwijderen.  </div>
           </Bullet>
           <Bullet>
-            <div>Vervolgens zie je de data zoals deze gedeeld zal worden, waarin informatie zoals namen verwijderd zijn. Hier kun je ook kiezen om berichten niet te delen met ons door ze te verwijderen. Ook kun je de zoekfunctie gebruiken om bepaalde berichten te zoeken en te verwijderen.  </div>
-          </Bullet>
-          <Bullet>
-            <div>Pas als je op de knop "Versturen" klikt, worden de gegevens verstuurd en opgeslagen. Door op de knop “Versturen” te klikken geef je aan goed geïnformeerd te zijn over het onderzoek en vrijwillig je Instagram data te delen. </div>
+            <div> Pas als je op de knop "Versturen" klikt, worden de gegevens verstuurd en opgeslagen. Door op de knop “Versturen” te klikken geef je aan goed geïnformeerd te zijn over het onderzoek en vrijwillig je Instagram data met ons te delen.   </div>
           </Bullet>
         </div>
 

@@ -142,8 +142,8 @@ export const ConsentForm = (props: Props): JSX.Element => {
 
   // ################################################################
   // changes by niek here
-  // this code will exclude all cols before a column that starts with "Hashed" 
-  
+  // this code will exclude all cols before a column that starts with "Hashed"
+
   function matchColsThatStartWithHashed (props: Weak<PropsUITableHead>): Array<boolean> {
     const regex : RegExp = /^Hashed.*/;
     return props.cells.map((cell) => regex.test(cell.text))
@@ -223,4 +223,4 @@ const cancelButtonLabel = new TextBundle()
 
 const description = new TextBundle()
   .add('en', 'Determine whether you would like to donate the data below. Carefully check the data and adjust when required. With your donation you contribute to the previously described research. Thank you in advance.')
-  .add('nl', 'Bepaal of u de onderstaande gegevens wilt doneren. Bekijk de gegevens zorgvuldig en pas zo nodig aan. Met uw donatie draagt u bij aan het eerder beschreven onderzoek. Alvast hartelijk dank.')
+  .add('nl', 'Bepaal of u de onderstaande gegevens wilt doneren. Bekijk de gegevens zorgvuldig en pas het zo nodig aan. Let op, bij jou in beeld verschijnen de namen van de andere mensen waarmee je op instagram hebt gepraat. Voordat het bestand word opgeslagen worden alle namen vervangen door een code. Zo weten wij niet om wie het gaat.')
