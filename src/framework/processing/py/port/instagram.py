@@ -309,6 +309,7 @@ def process_message_json(messages_list_dict: list[Any] | Any) -> list[str]:
 
                 if(m["sender_name"] != alter_username and m.get("content") is not None):
                     num_messages = num_messages + 1
+                    sender_mes = m["content"]
                     # removing potential non-ascii characters
                     # sender_mes = ''.join(filter(lambda x: x in printable, m["content"]))
                     # # removing potential extra white spaces
