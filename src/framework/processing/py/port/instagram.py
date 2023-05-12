@@ -309,10 +309,11 @@ def process_message_json(messages_list_dict: list[Any] | Any) -> list[str]:
 
                 if(m["sender_name"] != alter_username and m.get("content") is not None):
                     num_messages = num_messages + 1
+                    sender_mes = m["content"]
                     # removing potential non-ascii characters
-                    sender_mes = ''.join(filter(lambda x: x in printable, m["content"]))
-                    # removing potential extra white spaces
-                    sender_mes = " ".join(sender_mes.split())
+                    # sender_mes = ''.join(filter(lambda x: x in printable, m["content"]))
+                    # # removing potential extra white spaces
+                    # sender_mes = " ".join(sender_mes.split())
                     # counting the words
                     num_words = num_words + len(re.findall(r'\w+', sender_mes))
                     # counting the chars
@@ -340,8 +341,8 @@ def process_message_json(messages_list_dict: list[Any] | Any) -> list[str]:
 
 def process_messages(html: bytes) -> list[Any]:
     """
-    Extracts the relevant characteristics from an html 
-    containing messages (message_1.html) 
+    Extracts the relevant characteristics from an html
+    containing messages (message_1.html)
     """
     printable = set(string.printable)
 
@@ -488,7 +489,3 @@ def liked_posts_comments_to_df_html(posts_html: io.BytesIO, comments_html: io.By
         logger.error("Error: %s", e)
 
     return out
-
-
-
-
