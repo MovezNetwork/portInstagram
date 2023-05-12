@@ -38,19 +38,19 @@ TABLE_TITLES = {
     "instagram_your_personal_info": props.Translatable(
             {
                 "en": "Your personal info:",
-                "nl": "Your personal info:",
+                "nl": "Jouw persoonlijke informatie:",
             }
     ),
     "instagram_your_likes": props.Translatable(
             {
                 "en": "Your likes:",
-                "nl": "Your likes:",
+                "nl": "Jouw likes:",
             }
     ),
     "instagram_messages_summary": props.Translatable(
             {
                 "en": "Your messages summary:",
-                "nl": "Your messages summary:",
+                "nl": "Samenvatting van de berichten:",
             }
     ),
     "empty_result_set": props.Translatable(
