@@ -72,6 +72,22 @@ def validate_zip(zfile: Path) -> ValidateInput:
     return validate
 
 
+def fix_string_encoding(input: str) -> str:
+    """
+    Fixes the string encoding by attempting to encode it using the 'latin1' encoding and then decoding it.
+
+    Args:
+        input (str): The input string that needs to be fixed.
+
+    Returns:
+        str: The fixed string after encoding and decoding, or the original string if an exception occurs.
+    """
+    try:
+        fixed_string = input.encode("latin1").decode()
+        return fixed_string
+    except Exception:
+        return input
+
 
 def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[str]:
     """
@@ -327,7 +343,7 @@ def process_message_json(messages_list_dict: list[Any] | Any) -> list[str]:
                 alter_husername = alter_username.encode()
                 # alter_hinsta = alter_insta.encode()
 
-                out.append((alter_username,hashlib.sha256(alter_husername).hexdigest(), num_messages, num_words, num_chars))
+                out.append((fix_string_encoding(alter_username),hashlib.sha256(alter_husername).hexdigest(), num_messages, num_words, num_chars))
 
     except TypeError as e:
         logger.error("TypeError: %s", e)
@@ -441,8 +457,8 @@ def liked_posts_comments_to_df(liked_posts_dict: dict[Any, Any], liked_comments_
             hashlib.sha256(x.encode()).hexdigest()
     )
 
-    df_likes.columns = ['Username', 'Number Liked Posts', 'Number Liked Comments', 'Hashed Username']
-    df_likes = df_likes[['Username', 'Hashed Username', 'Number Liked Posts', 'Number Liked Comments']]
+    df_likes.columns = ['Gebruikersnaam', 'Aantal gelikete berichten', 'Aantal gelikete reacties', 'Hashed Gebruikersnaam']
+    df_likes = df_likes[['Gebruikersnaam', 'Hashed Gebruikersnaam', 'Aantal gelikete berichten', 'Aantal gelikete reacties']]
     #print('df_likes df_posts df_commentsshape', df_likes.shape,df_posts.shape,df_comments.shape)
     #print('df.duplicated ',df_likes[df_likes.duplicated(['alter_username'])])
     return df_likes
@@ -484,8 +500,8 @@ def liked_posts_comments_to_df_html(posts_html: io.BytesIO, comments_html: io.By
     out = pd.DataFrame()
     try:
         merged_df = pd.merge(posts, comments, on=[0, 1], how="outer").fillna(0)
-        merged_df.columns = ["Username", "Hashed Username", "Number Liked Posts", "Number Liked Comments"]
-        out = merged_df.sort_values("Number Liked Posts", ascending=False).reset_index(drop=True)
+        merged_df.columns = ["Gebruikersnaam", "Hashed Gebruikersnaam", "Aantal gelikete berichten", "Aantal gelikete reacties"]
+        out = merged_df.sort_values("Aantal gelikete berichten", ascending=False).reset_index(drop=True)
     except Exception as e:
         logger.error("Error: %s", e)
 
