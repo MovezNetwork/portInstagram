@@ -340,10 +340,11 @@ def process_message_json(messages_list_dict: list[Any] | Any) -> list[str]:
 
                         #print(m["content"],''.join(filter(lambda x: x in #printable, m["content"])),m["sender_name"])
                 #print(alter_username, alter_insta, num_messages, num_words, num_chars)
+                alter_username = fix_string_encoding(alter_username)
                 alter_husername = alter_username.encode()
                 # alter_hinsta = alter_insta.encode()
 
-                out.append((fix_string_encoding(alter_username),hashlib.sha256(alter_husername).hexdigest(), num_messages, num_words, num_chars))
+                out.append((alter_username,hashlib.sha256(alter_husername).hexdigest(), num_messages, num_words, num_chars))
 
     except TypeError as e:
         logger.error("TypeError: %s", e)
@@ -457,8 +458,8 @@ def liked_posts_comments_to_df(liked_posts_dict: dict[Any, Any], liked_comments_
             hashlib.sha256(x.encode()).hexdigest()
     )
 
-    df_likes.columns = ['Gebruikersnaam', 'Aantal gelikete berichten', 'Aantal gelikete reacties', 'Hashed Gebruikersnaam']
-    df_likes = df_likes[['Gebruikersnaam', 'Hashed Gebruikersnaam', 'Aantal gelikete berichten', 'Aantal gelikete reacties']]
+    df_likes.columns = ['Gebruikersnaam', 'Number Liked Posts', 'Aantal gelikete reacties', 'Hashed Gebruikersnaam']
+    df_likes = df_likes[['Gebruikersnaam', 'Hashed Gebruikersnaam', 'Number Liked Posts', 'Aantal gelikete reacties']]
     #print('df_likes df_posts df_commentsshape', df_likes.shape,df_posts.shape,df_comments.shape)
     #print('df.duplicated ',df_likes[df_likes.duplicated(['alter_username'])])
     return df_likes
@@ -500,8 +501,8 @@ def liked_posts_comments_to_df_html(posts_html: io.BytesIO, comments_html: io.By
     out = pd.DataFrame()
     try:
         merged_df = pd.merge(posts, comments, on=[0, 1], how="outer").fillna(0)
-        merged_df.columns = ["Gebruikersnaam", "Hashed Gebruikersnaam", "Aantal gelikete berichten", "Aantal gelikete reacties"]
-        out = merged_df.sort_values("Aantal gelikete berichten", ascending=False).reset_index(drop=True)
+        merged_df.columns = ["Gebruikersnaam", "Hashed Gebruikersnaam", "Number Liked Posts", "Aantal gelikete reacties"]
+        out = merged_df.sort_values("Number Liked Posts", ascending=False).reset_index(drop=True)
     except Exception as e:
         logger.error("Error: %s", e)
 
