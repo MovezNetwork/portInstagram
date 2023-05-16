@@ -68,18 +68,12 @@ export const Table = ({ id, head, body, readOnly = false, adjustable, pageSize =
     }
   }
 
-
   const [state, setState] = React.useState<State>(initialState)
 
   const copy = prepareCopy(locale)
 
   function display (element: keyof Visibility): string {
     return visible(element) ? '' : 'hidden'
-  }
-
-  function matchColsThatStartWithHashed (props: Weak<PropsUITableHead>): Array<boolean> {
-    const regex : RegExp = /^Hashed.*/;
-    return props.cells.map((cell) => regex.test(cell.text))
   }
 
   function visible (element: keyof Visibility): boolean {
@@ -134,19 +128,48 @@ export const Table = ({ id, head, body, readOnly = false, adjustable, pageSize =
     return filteredRows.current.slice(offset, offset + pageSize)
   }
 
+  // ######################################################
+  // CHANGES BY NIEK: do not show cols that should not be shown
+  // helpers
 
-// ######################################################
+  function applyOrOperator (arr1: boolean[], arr2: boolean[]): boolean[] {
+    if (arr1.length !== arr2.length) {
+      throw new Error('Arrays must have the same length')
+    }
+    const result: boolean[] = []
+    for (let i = 0; i < arr1.length; i++) {
+      const value = arr1[i] || arr2[i]
+      result.push(value)
+    }
+    return result
+  }
+
+  function matchColsThatStartWithHashed (props: Weak<PropsUITableHead>): boolean[] {
+    const regex: RegExp = /^Hashed.*/
+    return props.cells.map((cell) => regex.test(cell.text))
+  }
+
+  function matchColsThatStartWithHidden (props: Weak<PropsUITableHead>): boolean[] {
+    const regex: RegExp = /^Hidden.*/
+    return props.cells.map((cell) => regex.test(cell.text))
+  }
+
+  // ######################################################
+  // CHANGES BY NIEK: do not show cols that should not be shown
+  // Omit cols here (head rows):
+
   function renderHeadRow (props: Weak<PropsUITableHead>): JSX.Element {
+    const cells: JSX.Element[] = []
+    const colsThatStartWithHashed: boolean[] = matchColsThatStartWithHashed(head)
+    const colsThatStartWithHidden: boolean[] = matchColsThatStartWithHidden(head)
 
-        let cells : JSX.Element[] = []
-        const colsThatStartWithHashed : Array<boolean> = matchColsThatStartWithHashed(head)
-
-        props.cells.forEach((cell, index) => { 
-            if (colsThatStartWithHashed[index] === false) {
-                cells.push(renderHeadCell(cell, index))
-                console.log(index)
-            }
-        })
+    const colsTohide: boolean[] = applyOrOperator(colsThatStartWithHashed, colsThatStartWithHidden)
+    props.cells.forEach((cell, index) => {
+      if (!colsTohide[index]) {
+        cells.push(renderHeadCell(cell, index))
+        console.log(index)
+      }
+    })
 
     return (
       <tr>
@@ -177,16 +200,20 @@ export const Table = ({ id, head, body, readOnly = false, adjustable, pageSize =
     return state.rows.map((row, index) => renderRow(row, index))
   }
 
-// ######################################################
+  // ######################################################
+  // CHANGES BY NIEK: do not show cols that should not be shown
+  // Omit cols here (rows):
+  //
   function renderRow (row: PropsUITableRow, rowIndex: number): JSX.Element {
+    const cells: JSX.Element[] = []
+    const colsThatStartWithHashed: boolean[] = matchColsThatStartWithHashed(head)
+    const colsThatStartWithHidden: boolean[] = matchColsThatStartWithHidden(head)
 
-    let cells : JSX.Element[] = []
-    const colsThatStartWithHashed : Array<boolean> = matchColsThatStartWithHashed(head)
-
-    row.cells.forEach((cell, index) => { 
-        if (colsThatStartWithHashed[index] === false) {
-            cells.push(renderRowCell(cell, index))
-        }
+    const colsTohide: boolean[] = applyOrOperator(colsThatStartWithHashed, colsThatStartWithHidden)
+    row.cells.forEach((cell, index) => {
+      if (!colsTohide[index]) {
+        cells.push(renderRowCell(cell, index))
+      }
     })
 
     return (
