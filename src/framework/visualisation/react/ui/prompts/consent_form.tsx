@@ -141,34 +141,34 @@ export const ConsentForm = (props: Props): JSX.Element => {
   }
 
   // ################################################################
-  // changes by niek here
-  // this code will exclude all cols before a column that starts with "Hashed"
+  // CHANGES BY NIEK HERE
+  // This code will excludes in a donation: all cols before a column that starts with "Hashed"
 
-  function matchColsThatStartWithHashed (props: Weak<PropsUITableHead>): Array<boolean> {
-    const regex : RegExp = /^Hashed.*/;
+  function matchColsThatStartWithHashed (props: Weak<PropsUITableHead>): boolean[] {
+    const regex: RegExp = /^Hashed.*/
     return props.cells.map((cell) => regex.test(cell.text))
   }
 
   function serializeRow (row: PropsUITableRow, head: PropsUITableHead): any {
     assert(row.cells.length === head.cells.length, `Number of cells in row (${row.cells.length}) should be equals to number of cells in head (${head.cells.length})`)
 
-    let colsToDelete : Array<boolean> = matchColsThatStartWithHashed(head)
+    const colsToDelete: boolean[] = matchColsThatStartWithHashed(head)
     const firstElement = colsToDelete.shift()
     if (firstElement !== undefined) {
       colsToDelete.push(firstElement)
     }
 
-    let keys : Array<string> = []
-    let values : Array<string> = []
+    const keys: string[] = []
+    const values: string[] = []
 
     head.cells.forEach((cell, index) => {
-      if (colsToDelete[index] !== true) {
+      if (!colsToDelete[index]) {
         keys.push(cell.text)
       }
     })
 
     row.cells.forEach((cell, index) => {
-      if (colsToDelete[index] !== true) {
+      if (!colsToDelete[index]) {
         values.push(cell.text)
       }
     })
