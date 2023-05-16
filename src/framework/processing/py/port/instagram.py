@@ -48,6 +48,23 @@ STATUS_CODES = [
 ]
 
 
+def fix_string_encoding(input: str) -> str:
+    """
+    Fixes the string encoding by attempting to encode it using the 'latin1' encoding and then decoding it.
+
+    Args:
+        input (str): The input string that needs to be fixed.
+
+    Returns:
+        str: The fixed string after encoding and decoding, or the original string if an exception occurs.
+    """
+    try:
+        fixed_string = input.encode("latin1").decode()
+        return fixed_string
+    except Exception:
+        return input
+
+
 def validate_zip(zfile: Path) -> ValidateInput:
     """
     Validates the input of an Instagram zipfile
