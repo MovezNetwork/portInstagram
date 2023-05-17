@@ -458,8 +458,8 @@ def liked_posts_comments_to_df(liked_posts_dict: dict[Any, Any], liked_comments_
             hashlib.sha256(x.encode()).hexdigest()
     )
 
-    df_likes.columns = ['Gebruikersnaam', 'Number Liked Posts', 'Aantal gelikete reacties', 'Hashed Gebruikersnaam']
-    df_likes = df_likes[['Gebruikersnaam', 'Hashed Gebruikersnaam', 'Number Liked Posts', 'Aantal gelikete reacties']]
+    df_likes.columns = ['Gebruikersnaam', 'Berichten met likes', 'Reacties met likes', 'Hashed Gebruikersnaam']
+    df_likes = df_likes[['Gebruikersnaam', 'Hashed Gebruikersnaam', 'Berichten met likes', 'Reacties met likes']]
     #print('df_likes df_posts df_commentsshape', df_likes.shape,df_posts.shape,df_comments.shape)
     #print('df.duplicated ',df_likes[df_likes.duplicated(['alter_username'])])
     return df_likes
@@ -501,8 +501,8 @@ def liked_posts_comments_to_df_html(posts_html: io.BytesIO, comments_html: io.By
     out = pd.DataFrame()
     try:
         merged_df = pd.merge(posts, comments, on=[0, 1], how="outer").fillna(0)
-        merged_df.columns = ["Gebruikersnaam", "Hashed Gebruikersnaam", "Number Liked Posts", "Aantal gelikete reacties"]
-        out = merged_df.sort_values("Number Liked Posts", ascending=False).reset_index(drop=True)
+        merged_df.columns = ["Gebruikersnaam", "Hashed Gebruikersnaam", "Berichten met likes", "Reacties met likes"]
+        out = merged_df.sort_values("Berichten met likes", ascending=False).reset_index(drop=True)
     except Exception as e:
         logger.error("Error: %s", e)
 
