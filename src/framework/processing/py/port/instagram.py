@@ -48,6 +48,23 @@ STATUS_CODES = [
 ]
 
 
+def private_account_bool_to_str(value: str | bool) -> str:
+    """
+    Get the value of private account could be bool or str representation of bool
+    map str bools to values
+    """
+    value = str(value)
+
+    if value == "True":
+        out = "Prive"
+    elif value == "False":
+        out = "Publiek"
+    else:
+        out = value
+
+    return out
+        
+
 def validate_zip(zfile: Path) -> ValidateInput:
     """
     Validates the input of an Instagram zipfile
@@ -143,9 +160,11 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
 
         if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Private Account') is not None:
             private_account = dict_with_pinfo["profile_user"][0]["string_map_data"]["Private Account"]["value"]
+            private_account = private_account_bool_to_str(private_account)
+
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get(u'PrivÃ©account') is not None:
             private_account = dict_with_pinfo["profile_user"][0]["string_map_data"][u"PrivÃ©account"]["value"]
-
+            private_account = private_account_bool_to_str(private_account)
 
         out.append(username)
         hashed_uname = username.encode()
@@ -213,7 +232,7 @@ def personal_information_to_list_html(html_in: io.BytesIO) -> list[Any]:
         hashed_dname,
         extracted_info.get("gender", ""),
         extracted_info.get("dateofbirth", ""),
-        extracted_info.get("private_account", ""),
+        private_account_bool_to_str(extracted_info.get("private_account", "")),
     ]
 
     return out

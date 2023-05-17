@@ -233,7 +233,7 @@ def extract_instagram_json(instagram_zip):
         your_pinfo.append(instagram.followers_to_list(followers_dict))
         your_pinfo.append(instagram.following_to_list(following_dict))
 
-        df = pd.DataFrame([tuple(your_pinfo)], columns=["Gebruikersnaam", "Hashed Gebruikersnaam","Profielnaam","Hashed Profielnaam","Gender", "Date of birth", "Profiel", "Volgers", "Volgend"])
+        df = pd.DataFrame([tuple(your_pinfo)], columns=["Gebruikersnaam", "Hashed Gebruikersnaam","Profielnaam","Hashed Profielnaam","Gender", "Geboortedatum", "Profiel", "Volgers", "Volgend"])
         result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"], "adjustable": False}
 
     # extracting messages
@@ -253,7 +253,7 @@ def extract_instagram_json(instagram_zip):
 
     if liked_posts_dict and liked_posts_dict:
         df = instagram.liked_posts_comments_to_df(liked_posts_dict, liked_comments_dict)
-        df = df.sort_values("Number Liked Posts", ascending=False).reset_index(drop=True)
+        df = df.sort_values("Berichten met likes", ascending=False).reset_index(drop=True)
         if not df.empty:
             result["your_likes"] = {"data": df, "title": TABLE_TITLES["instagram_your_likes"]}
 
@@ -281,7 +281,7 @@ def extract_instagram_html(instagram_zip):
         following = instagram.followers_to_list_html(following_bytes)
         your_pinfo.append(following)
 
-        df = pd.DataFrame([tuple(your_pinfo)], columns=["Gebruikersnaam", "Hashed Gebruikersnaam","Profielnaam","Hashed Profielnaam","Gender", "Date of birth", "Profiel", "Volgers", "Volgend"])
+        df = pd.DataFrame([tuple(your_pinfo)], columns=["Gebruikersnaam", "Hashed Gebruikersnaam","Profielnaam","Hashed Profielnaam","Gender", "Geboortedatum", "Profiel", "Volgers", "Volgend"])
         result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"], "adjustable": False}
 
     # extracting messages
@@ -298,7 +298,7 @@ def extract_instagram_html(instagram_zip):
 
     df = instagram.liked_posts_comments_to_df_html(liked_posts_bytes, liked_comments_bytes)
     if not df.empty:
-        df = df.sort_values("Number Liked Posts", ascending=False).reset_index(drop=True)
+        df = df.sort_values("Berichten met likes", ascending=False).reset_index(drop=True)
         if not df.empty:
             result["your_likes"] = {"data": df, "title": TABLE_TITLES["instagram_your_likes"]}
 
