@@ -48,6 +48,23 @@ STATUS_CODES = [
 ]
 
 
+def private_account_bool_to_str(value: str | bool) -> str:
+    """
+    Get the value of private account could be bool or str representation of bool
+    map str bools to values
+    """
+    value = str(value)
+
+    if value == "True":
+        out = "Prive"
+    elif value == "False":
+        out = "Publiek"
+    else:
+        out = value
+
+    return out
+        
+
 def validate_zip(zfile: Path) -> ValidateInput:
     """
     Validates the input of an Instagram zipfile
@@ -143,9 +160,11 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
 
         if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Private Account') is not None:
             private_account = dict_with_pinfo["profile_user"][0]["string_map_data"]["Private Account"]["value"]
+            private_account = private_account_bool_to_str(private_account)
+
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get(u'PrivÃ©account') is not None:
             private_account = dict_with_pinfo["profile_user"][0]["string_map_data"][u"PrivÃ©account"]["value"]
-
+            private_account = private_account_bool_to_str(private_account)
 
         out.append(username)
         hashed_uname = username.encode()
@@ -213,7 +232,7 @@ def personal_information_to_list_html(html_in: io.BytesIO) -> list[Any]:
         hashed_dname,
         extracted_info.get("gender", ""),
         extracted_info.get("dateofbirth", ""),
-        extracted_info.get("private_account", ""),
+        private_account_bool_to_str(extracted_info.get("private_account", "")),
     ]
 
     return out
@@ -458,8 +477,8 @@ def liked_posts_comments_to_df(liked_posts_dict: dict[Any, Any], liked_comments_
             hashlib.sha256(x.encode()).hexdigest()
     )
 
-    df_likes.columns = ['Gebruikersnaam', 'Number Liked Posts', 'Aantal gelikete reacties', 'Hashed Gebruikersnaam']
-    df_likes = df_likes[['Gebruikersnaam', 'Hashed Gebruikersnaam', 'Number Liked Posts', 'Aantal gelikete reacties']]
+    df_likes.columns = ['Gebruikersnaam', 'Berichten met likes', 'Reacties met likes', 'Hashed Gebruikersnaam']
+    df_likes = df_likes[['Gebruikersnaam', 'Hashed Gebruikersnaam', 'Berichten met likes', 'Reacties met likes']]
     #print('df_likes df_posts df_commentsshape', df_likes.shape,df_posts.shape,df_comments.shape)
     #print('df.duplicated ',df_likes[df_likes.duplicated(['alter_username'])])
     return df_likes
@@ -501,8 +520,8 @@ def liked_posts_comments_to_df_html(posts_html: io.BytesIO, comments_html: io.By
     out = pd.DataFrame()
     try:
         merged_df = pd.merge(posts, comments, on=[0, 1], how="outer").fillna(0)
-        merged_df.columns = ["Gebruikersnaam", "Hashed Gebruikersnaam", "Number Liked Posts", "Aantal gelikete reacties"]
-        out = merged_df.sort_values("Number Liked Posts", ascending=False).reset_index(drop=True)
+        merged_df.columns = ["Gebruikersnaam", "Hashed Gebruikersnaam", "Berichten met likes", "Reacties met likes"]
+        out = merged_df.sort_values("Berichten met likes", ascending=False).reset_index(drop=True)
     except Exception as e:
         logger.error("Error: %s", e)
 
