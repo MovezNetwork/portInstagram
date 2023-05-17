@@ -152,7 +152,7 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
 
         # What is the english version of it? Get insta examples.
         if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Dateofbirth') is not None:
-            dateofbirth = dict_with_pinfo["profile_user"][0]["string_map_data"]["Dateofbirth"]["value"]
+            dateofbirth = dict_with_pinfo["profile_user"][0]["string_map_data"]["Date of birth"]["value"]
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Geboortedatum') is not None:
             dateofbirth = dict_with_pinfo["profile_user"][0]["string_map_data"]["Geboortedatum"]["value"]
 
