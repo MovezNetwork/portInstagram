@@ -63,7 +63,7 @@ def private_account_bool_to_str(value: str | bool) -> str:
         out = value
 
     return out
-        
+
 
 def validate_zip(zfile: Path) -> ValidateInput:
     """
@@ -141,13 +141,13 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
             displayname = dict_with_pinfo["profile_user"][0]["string_map_data"]["Name"]["value"]
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Naam') is not None:
             displayname = dict_with_pinfo["profile_user"][0]["string_map_data"]["Naam"]["value"]
-
+        if(len(displayname) == 0):
+            displayname = 'unspecified'
 
         if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Gender') is not None:
             gender = dict_with_pinfo["profile_user"][0]["string_map_data"]["Gender"]["value"]
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Geslacht') is not None:
             gender = dict_with_pinfo["profile_user"][0]["string_map_data"]["Geslacht"]["value"]
-
 
 
         # What is the english version of it? Get insta examples.
@@ -156,11 +156,13 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get('Geboortedatum') is not None:
             dateofbirth = dict_with_pinfo["profile_user"][0]["string_map_data"]["Geboortedatum"]["value"]
 
-
+        if(len(dateofbirth) == 0):
+            dateofbirth = 'unspecified'
 
         if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Private Account') is not None:
             private_account = dict_with_pinfo["profile_user"][0]["string_map_data"]["Private Account"]["value"]
             private_account = private_account_bool_to_str(private_account)
+
 
         elif dict_with_pinfo["profile_user"][0]["string_map_data"].get(u'PrivÃ©account') is not None:
             private_account = dict_with_pinfo["profile_user"][0]["string_map_data"][u"PrivÃ©account"]["value"]
