@@ -80,12 +80,21 @@ export const ConsentForm = (props: Props): JSX.Element => {
   }
 
   function renderTable (table: (Weak<PropsUITable> & TableContext), readOnly = false): JSX.Element {
-    return (
-      <div key={table.id} className='flex flex-col gap-4 mb-4'>
-        <Title4 text={table.title} margin='' />
-        <Table {...table} readOnly={readOnly} locale={locale} onChange={handleTableChange} />
-      </div>
-    )
+    if (table.title.length === 0) {
+        return (
+          <div key={table.id} className='flex flex-col -mt-20'>
+            <Title4 text={table.title} margin='' />
+            <Table {...table} readOnly={readOnly} locale={locale} onChange={handleTableChange} />
+          </div>
+        )
+    } else {
+        return (
+          <div key={table.id} className='flex flex-col gap-4 mt-4'>
+            <Title4 text={table.title} margin='' />
+            <Table {...table} readOnly={readOnly} locale={locale} onChange={handleTableChange} />
+          </div>
+        )
+    }
   }
 
   function handleTableChange (id: string, rows: PropsUITableRow[]): void {
