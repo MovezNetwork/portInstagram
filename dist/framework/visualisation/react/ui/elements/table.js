@@ -97,8 +97,43 @@ export var Table = function (_a) {
         var offset = currentPage * pageSize;
         return filteredRows.current.slice(offset, offset + pageSize);
     }
+    // ######################################################
+    // CHANGES BY NIEK: do not show cols that should not be shown
+    // helpers
+    function applyOrOperator(arr1, arr2) {
+        if (arr1.length !== arr2.length) {
+            throw new Error('Arrays must have the same length');
+        }
+        var result = [];
+        for (var i = 0; i < arr1.length; i++) {
+            var value = arr1[i] || arr2[i];
+            result.push(value);
+        }
+        return result;
+    }
+    function matchColsThatStartWithHashed(props) {
+        var regex = /^Hashed.*/;
+        return props.cells.map(function (cell) { return regex.test(cell.text); });
+    }
+    function matchColsThatStartWithHidden(props) {
+        var regex = /^Hidden.*/;
+        return props.cells.map(function (cell) { return regex.test(cell.text); });
+    }
+    // ######################################################
+    // CHANGES BY NIEK: do not show cols that should not be shown
+    // Omit cols here (head rows):
     function renderHeadRow(props) {
-        return (_jsxs("tr", { children: [state.edit ? renderHeadCheck() : '', props.cells.map(function (cell, index) { return renderHeadCell(cell, index); })] }));
+        var cells = [];
+        var colsThatStartWithHashed = matchColsThatStartWithHashed(head);
+        var colsThatStartWithHidden = matchColsThatStartWithHidden(head);
+        var colsTohide = applyOrOperator(colsThatStartWithHashed, colsThatStartWithHidden);
+        props.cells.forEach(function (cell, index) {
+            if (!colsTohide[index]) {
+                cells.push(renderHeadCell(cell, index));
+                console.log(index);
+            }
+        });
+        return (_jsxs("tr", { children: [state.edit ? renderHeadCheck() : '', cells] }));
     }
     function renderHeadCheck() {
         var selected = state.selected.length > 0 && state.selected.length === state.rows.length;
@@ -110,8 +145,21 @@ export var Table = function (_a) {
     function renderRows() {
         return state.rows.map(function (row, index) { return renderRow(row, index); });
     }
+    // ######################################################
+    // CHANGES BY NIEK: do not show cols that should not be shown
+    // Omit cols here (rows):
+    //
     function renderRow(row, rowIndex) {
-        return (_jsxs("tr", __assign({ className: 'hover:bg-grey6' }, { children: [state.edit ? renderRowCheck(row.id) : '', row.cells.map(function (cell, cellIndex) { return renderRowCell(cell, cellIndex); })] }), "".concat(rowIndex)));
+        var cells = [];
+        var colsThatStartWithHashed = matchColsThatStartWithHashed(head);
+        var colsThatStartWithHidden = matchColsThatStartWithHidden(head);
+        var colsTohide = applyOrOperator(colsThatStartWithHashed, colsThatStartWithHidden);
+        row.cells.forEach(function (cell, index) {
+            if (!colsTohide[index]) {
+                cells.push(renderRowCell(cell, index));
+            }
+        });
+        return (_jsxs("tr", __assign({ className: 'hover:bg-grey6' }, { children: [state.edit ? renderRowCheck(row.id) : '', cells] }), "".concat(rowIndex)));
     }
     function renderRowCheck(rowId) {
         var selected = state.selected.includes(rowId);

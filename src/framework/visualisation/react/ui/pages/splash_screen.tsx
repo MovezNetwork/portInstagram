@@ -91,7 +91,7 @@ export const SplashScreen = (props: Props): JSX.Element => {
         </div>
         <div className='mb-4'>
           We leggen stap voor stap uit hoe je dit kunt doen.
-          </div>
+        </div>
         <div className='flex flex-col gap-3 mb-6'>
           <Bullet>
             <div> Eerst sleep je het .zip bestand in het kader, of kies je het .zip bestand vanaf je computer. Vervolgens zie je de gegevens zoals deze gedeeld zullen worden. Hier kun je ook kiezen om bepaalde mensen niet met ons te delen  door ze te verwijderen. Je  kunt hiervoor de zoekfunctie gebruiken om bepaalde mensen te zoeken en te verwijderen.  </div>

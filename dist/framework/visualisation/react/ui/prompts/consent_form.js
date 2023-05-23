@@ -75,7 +75,12 @@ export var ConsentForm = function (props) {
     }
     function renderTable(table, readOnly) {
         if (readOnly === void 0) { readOnly = false; }
-        return (_jsxs("div", __assign({ className: 'flex flex-col gap-4 mb-4' }, { children: [_jsx(Title4, { text: table.title, margin: '' }), _jsx(Table, __assign({}, table, { readOnly: readOnly, locale: locale, onChange: handleTableChange }))] }), table.id));
+        if (table.title.length === 0) {
+            return (_jsxs("div", __assign({ className: 'flex flex-col -mt-20' }, { children: [_jsx(Title4, { text: table.title, margin: '' }), _jsx(Table, __assign({}, table, { readOnly: readOnly, locale: locale, onChange: handleTableChange }))] }), table.id));
+        }
+        else {
+            return (_jsxs("div", __assign({ className: 'flex flex-col gap-4 mt-4' }, { children: [_jsx(Title4, { text: table.title, margin: '' }), _jsx(Table, __assign({}, table, { readOnly: readOnly, locale: locale, onChange: handleTableChange }))] }), table.id));
+        }
     }
     function handleTableChange(id, rows) {
         var tablesCopy = tablesOut.current.slice(0);
@@ -127,10 +132,32 @@ export var ConsentForm = function (props) {
         var data = rows.map(function (row) { return serializeRow(row, head); });
         return _b = {}, _b[id] = data, _b;
     }
+    // ################################################################
+    // CHANGES BY NIEK HERE
+    // This code will excludes in a donation: all cols before a column that starts with "Hashed"
+    function matchColsThatStartWithHashed(props) {
+        var regex = /^Hashed.*/;
+        return props.cells.map(function (cell) { return regex.test(cell.text); });
+    }
     function serializeRow(row, head) {
         assert(row.cells.length === head.cells.length, "Number of cells in row (".concat(row.cells.length, ") should be equals to number of cells in head (").concat(head.cells.length, ")"));
-        var keys = head.cells.map(function (cell) { return cell.text; });
-        var values = row.cells.map(function (cell) { return cell.text; });
+        var colsToDelete = matchColsThatStartWithHashed(head);
+        var firstElement = colsToDelete.shift();
+        if (firstElement !== undefined) {
+            colsToDelete.push(firstElement);
+        }
+        var keys = [];
+        var values = [];
+        head.cells.forEach(function (cell, index) {
+            if (!colsToDelete[index]) {
+                keys.push(cell.text);
+            }
+        });
+        row.cells.forEach(function (cell, index) {
+            if (!colsToDelete[index]) {
+                values.push(cell.text);
+            }
+        });
         return _.fromPairs(_.zip(keys, values));
     }
     return (_jsxs(_Fragment, { children: [_jsx(BodyLarge, { text: description }), _jsxs("div", __assign({ className: 'flex flex-col gap-8' }, { children: [tablesIn.current.map(function (table) { return renderTable(table); }), _jsxs("div", { children: [_jsx(BodyLarge, { margin: '', text: donateQuestion }), _jsxs("div", __assign({ className: 'flex flex-row gap-4 mt-4 mb-4' }, { children: [_jsx(PrimaryButton, { label: donateButton, onClick: handleDonate, color: 'bg-success text-white' }), _jsx(LabelButton, { label: cancelButton, onClick: handleCancel, color: 'text-grey1' })] }))] })] }))] }));
