@@ -225,6 +225,7 @@ def extract_instagram_json(instagram_zip):
     pinfo_bytes = unzipddp.extract_file_from_zip(instagram_zip, "personal_information.json")
     pinfo_dict = unzipddp.read_json_from_bytes(pinfo_bytes)
 
+
     if pinfo_dict:
         your_pinfo = instagram.personal_information_to_list(pinfo_dict)
 
@@ -239,17 +240,13 @@ def extract_instagram_json(instagram_zip):
         your_pinfo.append(instagram.followers_to_list(followers_dict))
         your_pinfo.append(instagram.following_to_list(following_dict))
 
-<<<<<<< HEAD
         # df = pd.DataFrame([tuple(your_pinfo)], columns=["Gebruikersnaam", "Hashed Gebruikersnaam","Profielnaam","Hashed Profielnaam","Gender", "Geboortedatum", "Profiel", "Volgers", "Volgend"])
         # result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"], "adjustable": False}
         df = pd.DataFrame([tuple(your_pinfo[0:4])], columns=["Gebruikersnaam", "Hashed Gebruikersnaam","Profielnaam","Hashed Profielnaam"])
-=======
-        df = pd.DataFrame([tuple(your_pinfo)], columns=["Gebruikersnaam", "Hashed Gebruikersnaam","Profielnaam","Hashed Profielnaam","Gender", "Geboortedatum", "Profiel", "Hidden_Personal_Info_String", "Volgers", "Volgend"])
->>>>>>> pinfo-hashed-dict
         result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"], "adjustable": False}
         df = pd.DataFrame([tuple(your_pinfo[4:6])], columns=["Gender", "Geboortedatum"])
         result["your_info1"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info_empty"], "adjustable": False}
-        df = pd.DataFrame([tuple(your_pinfo[6:9])], columns=["Profiel", "Volgers", "Volgend"])
+        df = pd.DataFrame([tuple(your_pinfo[6:10])], columns=["Profiel", "Hidden json pstring", "Volgers", "Volgend"])
         result["your_info2"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info_empty"], "adjustable": False}
     # extracting messages
     messages_list_dict = unzipddp.extract_messages_from_zip(instagram_zip)
@@ -296,8 +293,15 @@ def extract_instagram_html(instagram_zip):
         following = instagram.followers_to_list_html(following_bytes)
         your_pinfo.append(following)
 
-        df = pd.DataFrame([tuple(your_pinfo)], columns=["Gebruikersnaam", "Hashed Gebruikersnaam","Profielnaam","Hashed Profielnaam","Gender", "Geboortedatum", "Profiel", "Hidden_Personal_Info_String", "Volgers", "Volgend"])
+        #df = pd.DataFrame([tuple(your_pinfo)], columns=["Gebruikersnaam", "Hashed Gebruikersnaam","Profielnaam","Hashed Profielnaam","Gender", "Geboortedatum", "Profiel", "Volgers", "Volgend"])
+        #result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"], "adjustable": False}
+
+        df = pd.DataFrame([tuple(your_pinfo[0:4])], columns=["Gebruikersnaam", "Hashed Gebruikersnaam","Profielnaam","Hashed Profielnaam"])
         result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"], "adjustable": False}
+        df = pd.DataFrame([tuple(your_pinfo[4:6])], columns=["Gender", "Geboortedatum"])
+        result["your_info1"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info_empty"], "adjustable": False}
+        df = pd.DataFrame([tuple(your_pinfo[6:10])], columns=["Profiel", "Hidden json pstring", "Volgers", "Volgend"])
+        result["your_info2"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info_empty"], "adjustable": False}
 
     # extracting messages
     your_messages = instagram.process_message_html(instagram_zip)

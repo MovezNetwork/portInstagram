@@ -137,15 +137,19 @@ def pinfo_dictionary_create(input_dict: dict[Any, Any]) -> str:
 
     for key,value in input_dict.items():
         # in this case no hashing is necessary
-        if(is_string_date(value['value']) or is_string_gender(value['value']) or is_string_true_false(value['value']) or is_string_email(value['value'])):
-            infoDictionary[key] = value['value']
-        # this is either a username or display name, hash it!
-        else:
-            name = fix_string_encoding(value['value'])
-            hname = name.encode()
-            infoDictionary[key] = hashlib.sha256(hname).hexdigest()
+        try:
+            if(is_string_date(value['value']) or is_string_gender(value['value']) or is_string_true_false(value['value']) or is_string_email(value['value'])):
+                infoDictionary[key] = value['value']
+            # this is either a username or display name, hash it!
+            else:
+                name = fix_string_encoding(value['value'])
+                hname = name.encode()
+                infoDictionary[key] = hashlib.sha256(hname).hexdigest()
+        except:
+            pass
 
     return json.dumps(infoDictionary)
+
 
 def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[str]:
     """
@@ -251,10 +255,11 @@ def personal_information_to_list_html(html_in: io.BytesIO) -> list[Any]:
         "Date of birth": "dateofbirth",
         "Geboortedatum": "dateofbirth",
         "Private Account": "private_account",
-        "PRIVATE ACCOUNT IN DUTCH": "private_account",
+        "Privéaccount" : "private_account",
     }
 
     extracted_info = {}
+    pinfo_dictionary = {}
     try:
         tree = etree.HTML(html)
         table_with_personal_info_class = "_2pin _a6_q"
@@ -262,8 +267,10 @@ def personal_information_to_list_html(html_in: io.BytesIO) -> list[Any]:
 
         for e in r:
             for x in e:
+                pinfo_dictionary[e.text] = {"value": x.getchildren()[0].text}
                 if e.text in info:
                     extracted_info[info[e.text]] = x.getchildren()[0].text
+
     except Exception as e:
         logger.error("Error: %s", e)
 
@@ -280,6 +287,7 @@ def personal_information_to_list_html(html_in: io.BytesIO) -> list[Any]:
         extracted_info.get("gender", ""),
         extracted_info.get("dateofbirth", ""),
         private_account_bool_to_str(extracted_info.get("private_account", "")),
+        pinfo_dictionary_create(pinfo_dictionary),
     ]
 
     return out
@@ -423,7 +431,7 @@ def process_message_json(messages_list_dict: list[Any] | Any) -> list[str]:
         return out
 
 
-def process_messages(html: bytes) -> list[Any]:
+def process_messages(html: bytes) -> list[Any] | None:
     """
     Extracts the relevant characteristics from an html
     containing messages (message_1.html)
@@ -443,6 +451,12 @@ def process_messages(html: bytes) -> list[Any]:
         alter_div_class="_3-8y _3-95 _a70a"
         r = tree.xpath(f"//div[@class='{alter_div_class}']//div[@class='_a70e']")
         alter_username = r[0].text
+
+        # Filter out group chats
+        pattern = r'^.*?,.*?and.*'
+        if re.match(pattern, alter_username):
+            return None
+
         alter_husername = hashlib.sha256(alter_username.encode()).hexdigest()
 
         # Loop through all messages that are not send by the alter
@@ -451,6 +465,7 @@ def process_messages(html: bytes) -> list[Any]:
 
         message_class="pam _3-95 _2ph- _a6-g uiBoxWhite noborder"
         r = tree.xpath(f"//div[@class='{message_class}']")
+
         for e in r:
             children = e.getchildren()
             sender_name = children[0].text
@@ -494,7 +509,9 @@ def process_message_html(path_to_zip) -> list[list[Any]]:
                 if 'message_1.html' in filename:
                     with zf.open(filename, 'r') as f:
                         html_with_messages = f.read()
-                        out.append(process_messages(html_with_messages))
+                        processed_message = process_messages(html_with_messages)
+                        if processed_message:
+                            out.append(processed_message)
 
     except Exception as e:
         logger.error("Error: %s", e)
@@ -573,3 +590,4 @@ def liked_posts_comments_to_df_html(posts_html: io.BytesIO, comments_html: io.By
         logger.error("Error: %s", e)
 
     return out
+

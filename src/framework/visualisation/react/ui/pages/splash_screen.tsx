@@ -7,7 +7,7 @@ import { ReactFactoryContext } from '../../factory'
 import { PrimaryButton } from '../elements/button'
 import { CheckBox } from '../elements/check_box'
 import { Label, Title1 } from '../elements/text'
-// import LogoSvg from '../../../../../assets/images/logo.svg'
+import LogoSvg from '../../../../../assets/images/logo.svg'
 import { Footer } from './templates/footer'
 import { Page } from './templates/page'
 import { Bullet } from '../elements/bullet'
@@ -109,6 +109,9 @@ export const SplashScreen = (props: Props): JSX.Element => {
 
   const body: JSX.Element = (
     <>
+      <div className='flex justify-center'>
+        <img src={LogoSvg} className='w-40 mb-10' />
+      </div>
       <Title1 text={title} />
       {renderDescription()}
       <div className='flex flex-col gap-8'>
