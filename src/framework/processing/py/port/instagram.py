@@ -13,6 +13,8 @@ import string
 import pandas as pd
 import hashlib
 import io
+import json
+from datetime import datetime
 
 from collections import Counter
 from lxml import etree
@@ -104,7 +106,46 @@ def fix_string_encoding(input: str) -> str:
         return fixed_string
     except Exception:
         return input
+# functions for processing personal information json
+def is_string_date(string):
+    date_format = "%Y-%m-%d"
+    try:
+        datetime.strptime(string, date_format)
+        return True
+    except ValueError:
+        return False
 
+def is_string_gender(string):
+    if string in ['male','female','unspecified']:
+        return True
+    else:
+        return False
+
+def is_string_true_false(string):
+    if string in ['True','False']:
+        return True
+    else:
+        return False
+
+def is_string_email(string):
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return re.match(pattern, string) is not None
+
+def pinfo_dictionary_create(input_dict: dict[Any, Any]) -> str:
+
+    infoDictionary = {}
+
+    for key,value in input_dict.items():
+        # in this case no hashing is necessary
+        if(is_string_date(value['value']) or is_string_gender(value['value']) or is_string_true_false(value['value']) or is_string_email(value['value'])):
+            infoDictionary[key] = value['value']
+        # this is either a username or display name, hash it!
+        else:
+            name = fix_string_encoding(value['value'])
+            hname = name.encode()
+            infoDictionary[key] = hashlib.sha256(hname).hexdigest()
+
+    return json.dumps(infoDictionary)
 
 def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[str]:
     """
@@ -130,6 +171,7 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
         dateofbirth = ''
         private_account = ''
 
+        pinfo_str = pinfo_dictionary_create(dict_with_pinfo["profile_user"][0]["string_map_data"])
         # we are handling english and dutch only for now
         if dict_with_pinfo["profile_user"][0]["string_map_data"].get('Username') is not None:
             username = dict_with_pinfo["profile_user"][0]["string_map_data"]["Username"]["value"]
@@ -172,14 +214,17 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
         hashed_uname = username.encode()
         out.append(hashlib.sha256(hashed_uname).hexdigest())
 
-        out.append(displayname)
-        hashed_dname = displayname.encode()
-        out.append(hashlib.sha256(hashed_dname).hexdigest())
+        out.append(displayname)        
+        if(len(displayname) != 0):
+            hashed_dname = displayname.encode()
+            out.append(hashlib.sha256(hashed_dname).hexdigest())
+        else:
+            out.append('')
 
         out.append(gender)
         out.append(dateofbirth)
         out.append(private_account)
-
+        out.append(pinfo_str)
 
 
     except TypeError as e:
