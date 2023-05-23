@@ -41,6 +41,12 @@ TABLE_TITLES = {
                 "nl": "Jouw persoonlijke informatie:",
             }
     ),
+    "instagram_your_personal_info_empty": props.Translatable(
+            {
+                "en": "",
+                "nl": "",
+            }
+    ),
     "instagram_your_likes": props.Translatable(
             {
                 "en": "Your likes:",
@@ -233,9 +239,14 @@ def extract_instagram_json(instagram_zip):
         your_pinfo.append(instagram.followers_to_list(followers_dict))
         your_pinfo.append(instagram.following_to_list(following_dict))
 
-        df = pd.DataFrame([tuple(your_pinfo)], columns=["Gebruikersnaam", "Hashed Gebruikersnaam","Profielnaam","Hashed Profielnaam","Gender", "Geboortedatum", "Profiel", "Volgers", "Volgend"])
+        # df = pd.DataFrame([tuple(your_pinfo)], columns=["Gebruikersnaam", "Hashed Gebruikersnaam","Profielnaam","Hashed Profielnaam","Gender", "Geboortedatum", "Profiel", "Volgers", "Volgend"])
+        # result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"], "adjustable": False}
+        df = pd.DataFrame([tuple(your_pinfo[0:4])], columns=["Gebruikersnaam", "Hashed Gebruikersnaam","Profielnaam","Hashed Profielnaam"])
         result["your_info"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info"], "adjustable": False}
-
+        df = pd.DataFrame([tuple(your_pinfo[4:6])], columns=["Gender", "Geboortedatum"])
+        result["your_info1"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info_empty"], "adjustable": False}
+        df = pd.DataFrame([tuple(your_pinfo[6:9])], columns=["Profiel", "Volgers", "Volgend"])
+        result["your_info2"] = {"data": df, "title": TABLE_TITLES["instagram_your_personal_info_empty"], "adjustable": False}
     # extracting messages
     messages_list_dict = unzipddp.extract_messages_from_zip(instagram_zip)
     your_messages = instagram.process_message_json(messages_list_dict)
