@@ -591,11 +591,26 @@ def liked_posts_comments_to_df_html(posts_html: io.BytesIO, comments_html: io.By
     comments =  extract_likes_html(comments_html)
 
     out = pd.DataFrame()
-    try:
-        merged_df = pd.merge(posts, comments, on=[0, 1], how="outer").fillna(0)
-        merged_df.columns = ["Gebruikersnaam", "Hashed Gebruikersnaam", "Berichten met likes", "Reacties met likes"]
-        out = merged_df.sort_values("Berichten met likes", ascending=False).reset_index(drop=True)
-    except Exception as e:
-        logger.error("Error: %s", e)
+    if not posts.empty and not comments.empty:
+        try:
+            merged_df = pd.merge(posts, comments, on=[0, 1], how="outer").fillna(0)
+            merged_df.columns = ["Gebruikersnaam", "Hashed Gebruikersnaam", "Berichten met likes", "Reacties met likes"]
+            out = merged_df.sort_values("Berichten met likes", ascending=False).reset_index(drop=True)
+        except Exception as e:
+            logger.error("Error: %s", e)
+
+    if not posts.empty and comments.empty:
+        try:
+            posts.columns = ["Gebruikersnaam", "Hashed Gebruikersnaam", "Berichten met likes"]
+            out = posts.sort_values("Berichten met likes", ascending=False).reset_index(drop=True)
+        except Exception as e:
+            logger.error("Error: %s", e)
+
+    if posts.empty and not comments.empty:
+        try:
+            comments.columns = ["Gebruikersnaam", "Hashed Gebruikersnaam", "Reacties met likes"]
+            out = comments.sort_values("Reacties met likes", ascending=False).reset_index(drop=True)
+        except Exception as e:
+            logger.error("Error: %s", e)
 
     return out
