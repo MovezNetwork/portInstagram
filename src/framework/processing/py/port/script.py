@@ -260,14 +260,14 @@ def extract_instagram_json(instagram_zip):
     # extracting liked_posts file
     liked_posts_bytes = unzipddp.extract_file_from_zip(instagram_zip, "liked_posts.json")
     liked_posts_dict = unzipddp.read_json_from_bytes(liked_posts_bytes)
+
     liked_comments_bytes = unzipddp.extract_file_from_zip(instagram_zip, "liked_comments.json")
     liked_comments_dict = unzipddp.read_json_from_bytes(liked_comments_bytes)
 
-    if liked_posts_dict and liked_posts_dict:
-        df = instagram.liked_posts_comments_to_df(liked_posts_dict, liked_comments_dict)
-        df = df.sort_values("Berichten met likes", ascending=False).reset_index(drop=True)
-        if not df.empty:
-            result["your_likes"] = {"data": df, "title": TABLE_TITLES["instagram_your_likes"]}
+    df = instagram.liked_posts_comments_to_df(liked_posts_dict, liked_comments_dict)
+    df = df.sort_values("Berichten met likes", ascending=False).reset_index(drop=True)
+    if not df.empty:
+        result["your_likes"] = {"data": df, "title": TABLE_TITLES["instagram_your_likes"]}
 
     return result
 

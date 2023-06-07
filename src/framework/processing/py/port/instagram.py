@@ -14,6 +14,8 @@ import pandas as pd
 import hashlib
 import io
 import json
+import numpy as np
+
 from datetime import datetime
 
 from collections import Counter
@@ -218,7 +220,7 @@ def personal_information_to_list(dict_with_pinfo: dict[Any, Any] | Any) -> list[
         hashed_uname = username.encode()
         out.append(hashlib.sha256(hashed_uname).hexdigest())
 
-        out.append(displayname)        
+        out.append(displayname)
         if(len(displayname) != 0):
             hashed_dname = displayname.encode()
             out.append(hashlib.sha256(hashed_dname).hexdigest())
@@ -520,16 +522,24 @@ def process_message_html(path_to_zip) -> list[list[Any]]:
 
 
 def liked_posts_comments_to_df(liked_posts_dict: dict[Any, Any], liked_comments_dict: dict[Any, Any] | Any) -> pd.DataFrame:
-    #print(liked_posts_dict,liked_comments_dict)
-    df_posts = pd.DataFrame(liked_posts_dict["likes_media_likes"])
-    df_posts = df_posts.groupby('title').count().reset_index()
 
-    df_posts.columns = ['alter_username', 'nliked_posts']
 
-    df_comments = pd.DataFrame(liked_comments_dict["likes_comment_likes"])
-    df_comments = df_comments.groupby('title').count().reset_index()
-    df_comments.columns = ['alter_username', 'nliked_comments']
 
+    if len(liked_posts_dict) == 0:
+        df_posts = pd.DataFrame(columns = ['alter_username', 'nliked_posts'])
+    else:
+        df_posts = pd.DataFrame(liked_posts_dict["likes_media_likes"])
+        df_posts = df_posts.groupby('title').count().reset_index()
+        df_posts.columns = ['alter_username', 'nliked_posts']
+
+    if len(liked_comments_dict) == 0:
+        df_comments = pd.DataFrame(columns = ['alter_username', 'nliked_comments'])
+    else:
+        df_comments = pd.DataFrame(liked_comments_dict["likes_comment_likes"])
+        df_comments = df_comments.groupby('title').count().reset_index()
+        df_comments.columns = ['alter_username', 'nliked_comments']
+
+    print('df_posts,df_comments',df_posts,df_comments)
 
     df_likes = pd.merge(df_posts, df_comments, on="alter_username", how="outer")
     df_likes = df_likes.fillna(0)
@@ -546,7 +556,6 @@ def liked_posts_comments_to_df(liked_posts_dict: dict[Any, Any], liked_comments_
     #print('df_likes df_posts df_commentsshape', df_likes.shape,df_posts.shape,df_comments.shape)
     #print('df.duplicated ',df_likes[df_likes.duplicated(['alter_username'])])
     return df_likes
-
 
 
 def extract_likes_html(html_in: io.BytesIO) -> pd.DataFrame:
@@ -590,4 +599,3 @@ def liked_posts_comments_to_df_html(posts_html: io.BytesIO, comments_html: io.By
         logger.error("Error: %s", e)
 
     return out
-
